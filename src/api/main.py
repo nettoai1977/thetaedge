@@ -12,6 +12,7 @@ import numpy as np
 from ..engine.black_scholes import black_scholes, calculate_greeks, implied_volatility
 from ..engine.strategies import StrategyTemplates
 from ..engine.backtest import BacktestEngine
+from ..engine.tracker import TradeTracker
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -114,6 +115,57 @@ class BacktestResponse(BaseModel):
     sharpe_ratio: float
     equity_curve: List[float]
     trades_count: int
+
+
+class AddTradeRequest(BaseModel):
+    ticker: str
+    strategy: str
+    direction: str
+    legs: List[Dict]
+    net_debit: float
+    contracts: int = 1
+    notes: str = ""
+    tags: List[str] = []
+
+
+class CloseTradeRequest(BaseModel):
+    trade_id: str
+    exit_price: float
+    exit_reason: str = "manual"
+    notes: str = ""
+
+
+class TradeResponse(BaseModel):
+    id: str
+    entry_date: str
+    exit_date: Optional[str]
+    ticker: str
+    strategy: str
+    direction: str
+    status: str
+    legs: List[Dict]
+    net_debit: float
+    contracts: int
+    exit_price: Optional[float]
+    pnl: Optional[float]
+    pnl_pct: Optional[float]
+    exit_reason: Optional[str]
+    notes: str
+    tags: List[str]
+
+
+class PortfolioSummary(BaseModel):
+    total_trades: int
+    closed_trades: int
+    open_trades: int
+    win_rate: float
+    total_pnl: float
+    avg_pnl: float
+    avg_win: float
+    avg_loss: float
+    profit_factor: float
+    best_trade: Optional[Dict]
+    worst_trade: Optional[Dict]
 
 
 # ============ API Endpoints ============
@@ -314,6 +366,80 @@ async def run_backtest(request: BacktestRequest):
         )
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+# ============ Trade Tracker Endpoints ============
+
+tracker = TradeTracker()
+
+
+@app.get("/api/trades", response_model=List[TradeResponse])
+async def get_trades(status: Optional[str] = None):
+    """Get all trades, optionally filtered by status"""
+    if status == "open":
+        trades = tracker.get_open_trades()
+    elif status == "closed":
+        trades = tracker.get_closed_trades()
+    else:
+        trades = tracker.trades
+    return trades
+
+
+@app.post("/api/trades", response_model=TradeResponse)
+async def add_trade(request: AddTradeRequest):
+    """Add a new trade"""
+    try:
+        trade = tracker.add_trade(
+            ticker=request.ticker,
+            strategy=request.strategy,
+            direction=request.direction,
+            legs=request.legs,
+            net_debit=request.net_debit,
+            contracts=request.contracts,
+            notes=request.notes,
+            tags=request.tags
+        )
+        return trade
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.put("/api/trades/close", response_model=TradeResponse)
+async def close_trade(request: CloseTradeRequest):
+    """Close an open trade"""
+    try:
+        trade = tracker.close_trade(
+            trade_id=request.trade_id,
+            exit_price=request.exit_price,
+            exit_reason=request.exit_reason,
+            notes=request.notes
+        )
+        return trade
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.delete("/api/trades/{trade_id}")
+async def delete_trade(trade_id: str):
+    """Delete a trade"""
+    success = tracker.delete_trade(trade_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Trade not found")
+    return {"status": "deleted"}
+
+
+@app.get("/api/portfolio", response_model=PortfolioSummary)
+async def get_portfolio_summary():
+    """Get portfolio performance summary"""
+    return tracker.get_performance_summary()
+
+
+@app.get("/api/portfolio/strategies")
+async def get_strategy_breakdown():
+    """Get performance breakdown by strategy"""
+    return tracker.get_strategy_breakdown()
 
 
 if __name__ == "__main__":

@@ -437,3 +437,133 @@ function updateEquityChart(equityCurve) {
         }
     });
 }
+
+// Trade Tracker functions
+let trades = [];
+
+function addTrade() {
+    const ticker = document.getElementById('tradeTicker').value;
+    const strategy = document.getElementById('tradeStrategy').value;
+    const debit = +document.getElementById('tradeDebit').value;
+    const contracts = +document.getElementById('tradeContracts').value;
+    
+    if (!debit || debit <= 0) {
+        alert('Please enter a valid net debit');
+        return;
+    }
+    
+    const trade = {
+        id: 'T' + Date.now(),
+        entry_date: new Date().toISOString(),
+        ticker: ticker,
+        strategy: strategy,
+        net_debit: debit,
+        contracts: contracts,
+        status: 'open',
+        pnl: null,
+        pnl_pct: null
+    };
+    
+    trades.push(trade);
+    saveTrades();
+    updateTrackerUI();
+    
+    // Clear form
+    document.getElementById('tradeDebit').value = '';
+    document.getElementById('tradeContracts').value = '1';
+}
+
+function closeTrade(tradeId, exitPrice) {
+    const trade = trades.find(t => t.id === tradeId);
+    if (trade) {
+        trade.status = 'closed';
+        trade.exit_date = new Date().toISOString();
+        trade.exit_price = exitPrice;
+        trade.pnl = (exitPrice - trade.net_debit) * trade.contracts * 100;
+        trade.pnl_pct = ((exitPrice - trade.net_debit) / trade.net_debit) * 100;
+        
+        saveTrades();
+        updateTrackerUI();
+    }
+}
+
+function deleteTrade(tradeId) {
+    trades = trades.filter(t => t.id !== tradeId);
+    saveTrades();
+    updateTrackerUI();
+}
+
+function saveTrades() {
+    localStorage.setItem('thetaedge_trades', JSON.stringify(trades));
+}
+
+function loadTrades() {
+    const saved = localStorage.getItem('thetaedge_trades');
+    if (saved) {
+        trades = JSON.parse(saved);
+    }
+    updateTrackerUI();
+}
+
+function updateTrackerUI() {
+    const openTrades = trades.filter(t => t.status === 'open');
+    const closedTrades = trades.filter(t => t.status === 'closed');
+    
+    // Update summary
+    document.getElementById('totalTrades').textContent = trades.length;
+    document.getElementById('openPositions').textContent = openTrades.length;
+    
+    if (closedTrades.length > 0) {
+        const wins = closedTrades.filter(t => t.pnl > 0).length;
+        const winRate = ((wins / closedTrades.length) * 100).toFixed(1);
+        const totalPnl = closedTrades.reduce((a, b) => a + (b.pnl || 0), 0);
+        
+        document.getElementById('winRate').textContent = winRate + '%';
+        document.getElementById('totalPnl').textContent = '$' + Math.round(totalPnl).toLocaleString();
+    }
+    
+    // Render open trades
+    const openDiv = document.getElementById('openTrades');
+    if (openTrades.length === 0) {
+        openDiv.innerHTML = '<p class="text-slate-400 text-center">No open trades</p>';
+    } else {
+        openDiv.innerHTML = openTrades.map(t => `
+            <div class="bg-slate-900/50 rounded-lg p-4 flex justify-between items-center">
+                <div>
+                    <span class="text-white font-semibold">${t.ticker}</span>
+                    <span class="text-slate-400 ml-2">${t.strategy}</span>
+                    <span class="text-cyan-400 ml-2">$${t.net_debit} x${t.contracts}</span>
+                </div>
+                <div class="flex space-x-2">
+                    <input type="number" id="exit_${t.id}" placeholder="Exit price" class="w-24 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-sm">
+                    <button onclick="closeTrade('${t.id}', +document.getElementById('exit_${t.id}').value)" class="px-3 py-1 bg-green-600 hover:bg-green-500 text-white rounded text-sm">Close</button>
+                    <button onclick="deleteTrade('${t.id}')" class="px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-sm">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // Render closed trades
+    const historyDiv = document.getElementById('tradeHistory');
+    if (closedTrades.length === 0) {
+        historyDiv.innerHTML = '<p class="text-slate-400 text-center">No closed trades</p>';
+    } else {
+        historyDiv.innerHTML = closedTrades.map(t => `
+            <div class="bg-slate-900/50 rounded-lg p-4 flex justify-between items-center">
+                <div>
+                    <span class="text-white font-semibold">${t.ticker}</span>
+                    <span class="text-slate-400 ml-2">${t.strategy}</span>
+                    <span class="text-slate-400 ml-2">$${t.net_debit} → $${t.exit_price}</span>
+                </div>
+                <div class="text-right">
+                    <span class="${t.pnl >= 0 ? 'text-green-400' : 'text-red-400'} font-semibold">
+                        ${t.pnl >= 0 ? '+' : ''}$${Math.round(t.pnl)} (${t.pnl_pct >= 0 ? '+' : ''}${t.pnl_pct.toFixed(1)}%)
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// Initialize tracker on load
+loadTrades();
