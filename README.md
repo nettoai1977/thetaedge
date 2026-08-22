@@ -4,7 +4,8 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
-[![Status: In Development](https://img.shields.io/badge/Status-In%20Development-orange.svg)](#)
+[![Status: Complete](https://img.shields.io/badge/Status-Complete-brightgreen.svg)](#)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Deployed-brightgreen)](https://theta-edge-app.web.app)
 
 ---
 
@@ -12,36 +13,28 @@
 
 ThetaEdge is a comprehensive options trading toolkit designed for systematic options selling strategies, inspired by Ravish's proven approach that generated $500,000+ in verified profits.
 
-### Key Features
+### 🎯 All 4 Phases Complete!
 
-- 🧮 **Strategy Calculator** — Interactive payoff diagrams with real-time Greeks
-- 📊 **Backtesting Engine** — Test strategies on historical data
-- 📈 **Trade Tracker** — Log and analyze performance
-- ⚡ **VIX Monitor** — Entry signal alerts
+| Phase | Feature | Status |
+|-------|---------|--------|
+| 1 | Strategy Calculator | ✅ Complete |
+| 2 | Backtesting Engine | ✅ Complete |
+| 3 | Trade Tracker | ✅ Complete |
+| 4 | VIX Monitor | ✅ Complete |
 
----
-
-## 🎯 What is ThetaEdge?
-
-ThetaEdge is built on the principle that **time decay (theta) is your edge**. Instead of predicting market direction, we collect premium systematically:
-
-| Strategy | Win Rate | Risk/Reward | Best Market |
-|----------|----------|-------------|-------------|
-| Double Calendar | ~80% | 1:1 to 2:1 | Range-bound |
-| Time Spread | ~70% | 1:3+ | Slow grind |
-| Double Diagonal | ~75% | 1:2 | High IV |
+**Live App:** https://theta-edge-app.web.app
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Use Live App (Recommended)
 
-- Python 3.11+
-- Node.js 18+ (for frontend)
-- Moomoo NZ account (for live trading)
+1. Go to https://theta-edge-app.web.app
+2. Login with credentials
+3. Start using the calculator!
 
-### Installation
+### Option 2: Run Locally
 
 ```bash
 # Clone the repository
@@ -51,20 +44,73 @@ cd thetaedge
 # Install Python dependencies
 pip install -r requirements.txt
 
-# Install frontend dependencies
-cd src/frontend
-npm install
+# Start the backend
+python -m src.api.main
+
+# Open public/index.html in browser
 ```
 
-### Usage
+---
 
-```bash
-# Start the backend
-python -m src.api.server
+## 🧮 Features
 
-# Start the frontend
-cd src/frontend
-npm run dev
+### Phase 1: Strategy Calculator
+- Black-Scholes pricing engine
+- Greeks calculator (Delta, Gamma, Theta, Vega, Rho)
+- Interactive payoff diagrams (Chart.js)
+- Strategy templates (Double Calendar, Calendar Spread)
+- Real-time calculations
+
+### Phase 2: Backtesting Engine
+- Double Calendar strategy backtester
+- Performance metrics (win rate, profit factor, Sharpe ratio)
+- Equity curve visualization
+- Configurable parameters
+
+### Phase 3: Trade Tracker
+- Add/close/delete trades
+- Portfolio summary (win rate, total P&L)
+- Open positions view
+- Trade history with P&L tracking
+- localStorage persistence
+
+### Phase 4: VIX Monitor
+- Real-time VIX display
+- Entry signal system (ENTER/HOLD/CAUTION/WAIT)
+- VIX zones guide
+- VIX statistics (7d avg, 30d avg, min, max)
+- VIX history chart
+
+---
+
+## 🏗️ Architecture
+
+```
+thetaedge/
+├── public/                      # Frontend
+│   ├── index.html               # Main UI (5 tabs)
+│   └── app.js                   # Frontend logic
+├── src/
+│   ├── engine/                  # Calculation engines
+│   │   ├── black_scholes.py     # Black-Scholes pricing
+│   │   ├── strategies.py        # Strategy templates
+│   │   ├── backtest.py          # Backtesting engine
+│   │   ├── tracker.py           # Trade tracker
+│   │   └── vix_monitor.py       # VIX monitoring
+│   └── api/
+│       └── main.py              # FastAPI backend
+├── docs/                        # Documentation
+│   ├── strategies/              # Strategy guides
+│   ├── greeks/                  # Greeks reference
+│   ├── moomoo/                  # Broker setup
+│   └── backtesting/             # Backtesting guides
+├── research/                    # Research documents
+│   ├── blueprint.md             # Project blueprint
+│   ├── ui-research.md           # UI/UX research
+│   └── tech-research.md         # Technical research
+├── requirements.txt             # Python dependencies
+├── firebase.json                # Firebase config
+└── README.md                    # This file
 ```
 
 ---
@@ -81,32 +127,13 @@ npm run dev
 
 ---
 
-## 🏗️ Architecture
+## 🎯 Strategies Supported
 
-```
-thetaedge/
-├── docs/                    # Documentation
-│   ├── strategies/          # Strategy guides
-│   ├── greeks/              # Greeks reference
-│   ├── moomoo/              # Broker setup
-│   └── backtesting/         # Backtesting guides
-├── research/                # Research documents
-│   ├── blueprint.md         # Project blueprint
-│   ├── ui-research.md       # UI/UX research
-│   └── tech-research.md     # Technical research
-├── src/
-│   ├── engine/              # Calculation engine
-│   │   ├── black_scholes.py # Black-Scholes model
-│   │   ├── greeks.py        # Greeks calculator
-│   │   ├── payoff.py        # Payoff diagrams
-│   │   └── strategies/      # Strategy templates
-│   ├── components/          # Frontend components
-│   ├── api/                 # Backend API
-│   └── data/                # Data layer
-├── scripts/                 # Utility scripts
-├── tests/                   # Test suite
-└── requirements.txt         # Python dependencies
-```
+| Strategy | Win Rate | Risk/Reward | Best Market |
+|----------|----------|-------------|-------------|
+| Double Calendar | ~80% | 1:1 to 2:1 | Range-bound |
+| Time Spread | ~70% | 1:3+ | Slow grind |
+| Double Diagonal | ~75% | 1:2 | High IV |
 
 ---
 
@@ -143,6 +170,18 @@ Ravish's verified results (Kinfo):
 
 ---
 
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | HTML5 + Tailwind CSS + Chart.js |
+| Backend | Python FastAPI |
+| Calculation | NumPy + SciPy |
+| Hosting | Firebase Hosting |
+| Database | localStorage (client-side) |
+
+---
+
 ## ⚠️ Risk Disclaimer
 
 > **Options trading involves substantial risk and is not suitable for every investor.**
@@ -153,19 +192,6 @@ Ravish's verified results (Kinfo):
 > - Never risk money you can't afford to lose
 > 
 > This is for educational purposes only. Not financial advice.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|-------|------------|
-| Frontend | React + TypeScript + Tailwind CSS |
-| Charts | Recharts / D3.js |
-| Backend | Python FastAPI |
-| Calculation | NumPy + SciPy |
-| Data | yfinance |
-| Database | SQLite |
 
 ---
 
@@ -186,6 +212,7 @@ Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 **Michael Netto** — Christchurch, New Zealand
 
 - GitHub: [@nettoai1977](https://github.com/nettoai1977)
+- Live App: https://theta-edge-app.web.app
 
 ---
 
