@@ -40,7 +40,7 @@ function logout() {
 // ============ Navigation ============
 function showTab(tab) {
     // Hide all tabs
-    ['calculator', 'scan', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
+    ['calculator', 'scan', 'tools', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
         document.getElementById(t + 'Tab').classList.add('hidden');
     });
     
@@ -61,6 +61,8 @@ function showTab(tab) {
         loadCalendarData();
     } else if (tab === 'scan') {
         loadTickerScan();
+    } else if (tab === 'tools') {
+        loadOptionsChain();
     }
 }
 
@@ -559,7 +561,130 @@ function calculatePosition() {
     if (navigator.vibrate) navigator.vibrate(10);
 }
 
-// ============ Ticker Scanner ============
+// ============ Tools Tab Functions ============
+
+// Options Chain
+function loadOptionsChain() {
+    const chain = [
+        { strike: 470, bid: 12.50, ask: 12.80, iv: 22.5 },
+        { strike: 475, bid: 10.20, ask: 10.50, iv: 21.8 },
+        { strike: 480, bid: 8.10, ask: 8.40, iv: 21.2 },
+        { strike: 485, bid: 6.20, ask: 6.50, iv: 20.8 },
+        { strike: 490, bid: 4.50, ask: 4.80, iv: 20.5 },
+        { strike: 495, bid: 3.10, ask: 3.40, iv: 20.2 },
+        { strike: 500, bid: 2.00, ask: 2.30, iv: 20.0 },
+        { strike: 505, bid: 1.20, ask: 1.50, iv: 19.8 },
+        { strike: 510, bid: 0.70, ask: 1.00, iv: 19.5 },
+        { strike: 515, bid: 0.40, ask: 0.70, iv: 19.2 },
+    ];
+    
+    const container = document.getElementById('optionsChain');
+    container.innerHTML = chain.map(o => `
+        <div class="grid grid-cols-4 gap-2 text-xs py-1 ${o.strike === 485 ? 'bg-cyan-500/10 rounded px-1' : ''}">
+            <span class="text-white ${o.strike === 485 ? 'font-semibold' : ''}">${o.strike}</span>
+            <span class="text-right text-green-400">${o.bid.toFixed(2)}</span>
+            <span class="text-right text-red-400">${o.ask.toFixed(2)}</span>
+            <span class="text-right text-slate-400">${o.iv}%</span>
+        </div>
+    `).join('');
+}
+
+// Roll Advisor
+function checkRoll() {
+    const days = +document.getElementById('rollDays').value;
+    const delta = +document.getElementById('rollDelta').value;
+    const pnl = +document.getElementById('rollPnl').value;
+    
+    let urgency, color, reason, notes;
+    
+    if (days <= 7) {
+        urgency = '⚠️ ROLL NOW';
+        color = 'text-red-400';
+        reason = `Only ${days} days to expiry - high gamma risk`;
+        notes = 'Consider rolling to next month expiry';
+    } else if (Math.abs(delta) > 0.40) {
+        urgency = '⚠️ ROLL SOON';
+        color = 'text-orange-400';
+        reason = `Delta at ${delta.toFixed(2)} - getting too directional`;
+        notes = 'Consider rolling to different strikes';
+    } else if (pnl >= 50) {
+        urgency = '✅ TAKE PROFIT';
+        color = 'text-green-400';
+        reason = `At ${pnl}% profit - consider closing`;
+        notes = 'Good opportunity to realize gains';
+    } else if (pnl <= -30) {
+        urgency = '🛑 CUT LOSS';
+        color = 'text-red-400';
+        reason = `At ${pnl}% loss - review strategy`;
+        notes = 'Consider closing and reassessing';
+    } else {
+        urgency = '✅ HOLD';
+        color = 'text-green-400';
+        reason = 'Position is healthy';
+        notes = `${days} days to expiry, delta at ${delta.toFixed(2)}`;
+    }
+    
+    document.getElementById('rollUrgency').textContent = urgency;
+    document.getElementById('rollUrgency').className = `text-sm font-semibold mb-1 ${color}`;
+    document.getElementById('rollReason').textContent = reason;
+    document.getElementById('rollNotes').textContent = notes;
+    document.getElementById('rollResult').classList.remove('hidden');
+    
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
+// Alerts
+let alerts = [];
+
+function showAddAlert() {
+    const symbol = prompt('Enter symbol (e.g., QQQ):');
+    if (!symbol) return;
+    
+    const type = prompt('Alert type:\n1. Price Above\n2. Price Below\n\nEnter 1 or 2:');
+    if (!type) return;
+    
+    const threshold = parseFloat(prompt('Enter price threshold:'));
+    if (isNaN(threshold)) return;
+    
+    alerts.push({
+        id: Date.now(),
+        symbol: symbol.toUpperCase(),
+        type: type === '1' ? 'price_above' : 'price_below',
+        threshold: threshold,
+        triggered: false
+    });
+    
+    updateAlertsList();
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
+function updateAlertsList() {
+    const container = document.getElementById('alertsList');
+    
+    if (alerts.length === 0) {
+        container.innerHTML = '<p class="text-slate-400 text-sm text-center">No alerts set</p>';
+        return;
+    }
+    
+    container.innerHTML = alerts.map(a => `
+        <div class="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
+            <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 rounded-full ${a.triggered ? 'bg-green-400' : 'bg-yellow-400'}"></div>
+                <span class="text-sm text-white">${a.symbol}</span>
+                <span class="text-xs text-slate-400">${a.type === 'price_above' ? '↑' : '↓'} $${a.threshold}</span>
+            </div>
+            <button onclick="deleteAlert(${a.id})" class="text-xs text-red-400">✕</button>
+        </div>
+    `).join('');
+}
+
+function deleteAlert(id) {
+    alerts = alerts.filter(a => a.id !== id);
+    updateAlertsList();
+}
+
+// Initialize tools
+loadOptionsChain();
 function loadTickerScan() {
     const tickers = getTickerData();
     

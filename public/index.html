@@ -570,6 +570,106 @@
                 </div>
             </div>
 
+            <!-- Tools Tab -->
+            <div id="toolsTab" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-6">Trading Tools</h1>
+                
+                <!-- Options Chain -->
+                <div class="mobile-card mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-white">Options Chain</h3>
+                        <span class="text-xs text-slate-400">QQQ</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="grid grid-cols-4 gap-2 text-xs text-slate-400 pb-2 border-b border-slate-700/50">
+                            <span>Strike</span>
+                            <span class="text-right">Bid</span>
+                            <span class="text-right">Ask</span>
+                            <span class="text-right">IV</span>
+                        </div>
+                        <div id="optionsChain" class="space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Roll Advisor -->
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Roll Advisor</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Days to Expiry</label>
+                                <input type="number" id="rollDays" value="7" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Current Delta</label>
+                                <input type="number" id="rollDelta" value="0.30" step="0.01" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">P&L %</label>
+                                <input type="number" id="rollPnl" value="0" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Type</label>
+                                <select id="rollType" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                                    <option value="call">Call</option>
+                                    <option value="put">Put</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="checkRoll()" class="w-full h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-colors">
+                            Check Roll Status
+                        </button>
+                        <div id="rollResult" class="hidden bg-slate-900/50 rounded-lg p-3">
+                            <div id="rollUrgency" class="text-sm font-semibold mb-1"></div>
+                            <p id="rollReason" class="text-xs text-slate-400"></p>
+                            <p id="rollNotes" class="text-xs text-slate-400 mt-2"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Alerts -->
+                <div class="mobile-card mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-white">Price Alerts</h3>
+                        <button onclick="showAddAlert()" class="text-xs text-cyan-400">+ Add</button>
+                    </div>
+                    <div id="alertsList" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">No alerts set</p>
+                    </div>
+                </div>
+                
+                <!-- Greeks Monitor -->
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">Greeks Summary</h3>
+                    <div class="grid grid-cols-5 gap-2 text-center">
+                        <div>
+                            <p class="text-xs text-slate-400">Delta</p>
+                            <p class="text-sm font-semibold text-cyan-400">0.54</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">Gamma</p>
+                            <p class="text-sm font-semibold text-cyan-400">0.013</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">Theta</p>
+                            <p class="text-sm font-semibold text-green-400">-0.25</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">Vega</p>
+                            <p class="text-sm font-semibold text-cyan-400">0.63</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400">Rho</p>
+                            <p class="text-sm font-semibold text-cyan-400">0.23</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Calendar Tab -->
             <div id="calendarTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">US Market Calendar</h1>
@@ -822,11 +922,12 @@
                 </svg>
                 <span>Scan</span>
                 </button>
-                <button onclick="showTab('calendar')" id="nav-calendar" class="bottom-nav-item">
+                <button onclick="showTab('tools')" id="nav-tools" class="bottom-nav-item">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
-                <span>Calendar</span>
+                <span>Tools</span>
                 </button>
                 <button onclick="showTab('tracker')" id="nav-tracker" class="bottom-nav-item">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
