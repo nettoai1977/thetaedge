@@ -509,6 +509,92 @@
                 </div>
             </div>
             
+            <!-- Calendar Tab -->
+            <div id="calendarTab" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-6">US Market Calendar</h1>
+                
+                <!-- Market Status -->
+                <div id="marketStatusCard" class="mobile-card mb-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-1">Market Status</p>
+                            <p id="marketStatus" class="text-xl font-bold text-white">--</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-slate-400 mb-1">US Time</p>
+                            <p id="usTime" class="text-lg font-semibold text-cyan-400">--</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-700/50">
+                        <div>
+                            <p class="text-xs text-slate-400 mb-1">NZ Time</p>
+                            <p id="nzTime" class="text-lg font-semibold text-green-400">--</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-xs text-slate-400 mb-1">Next Event</p>
+                            <p id="nextEvent" class="text-sm text-slate-300">--</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Market Hours (NZ) -->
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Market Hours (NZ Time)</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between py-2 border-b border-slate-700/50">
+                            <span class="text-sm text-slate-400">Pre-Market</span>
+                            <span class="text-sm text-white">9:00 PM - 2:30 AM</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2 border-b border-slate-700/50">
+                            <span class="text-sm text-slate-400">Regular Hours</span>
+                            <span class="text-sm text-white">2:30 AM - 9:00 AM</span>
+                        </div>
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-sm text-slate-400">After Hours</span>
+                            <span class="text-sm text-white">9:00 AM - 1:00 PM</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upcoming Events -->
+                <div class="mobile-card mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-semibold text-white">Upcoming Events</h3>
+                        <span id="eventCount" class="text-xs text-slate-400">0 events</span>
+                    </div>
+                    <div id="upcomingEvents" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">Loading events...</p>
+                    </div>
+                </div>
+                
+                <!-- Quick Reference -->
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">Quick Reference</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center space-x-3 py-2 border-b border-slate-700/50">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <span class="text-sm text-white">CPI Report</span>
+                            <span class="text-xs text-slate-400 ml-auto">2nd week monthly</span>
+                        </div>
+                        <div class="flex items-center space-x-3 py-2 border-b border-slate-700/50">
+                            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                            <span class="text-sm text-white">FOMC Meeting</span>
+                            <span class="text-xs text-slate-400 ml-auto">8x per year</span>
+                        </div>
+                        <div class="flex items-center space-x-3 py-2 border-b border-slate-700/50">
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="text-sm text-white">NFP (Jobs)</span>
+                            <span class="text-xs text-slate-400 ml-auto">1st Friday monthly</span>
+                        </div>
+                        <div class="flex items-center space-x-3 py-2">
+                            <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+                            <span class="text-sm text-white">Options Expiry</span>
+                            <span class="text-xs text-slate-400 ml-auto">3rd Friday monthly</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Backtest Tab -->
             <div id="backtestTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">Backtest</h1>
@@ -664,22 +750,28 @@
         <nav class="bottom-nav">
             <div class="flex justify-around items-center max-w-lg mx-auto">
                 <button onclick="showTab('calculator')" id="nav-calculator" class="bottom-nav-item active">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                    </svg>
-                    <span>Calc</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                <span>Calc</span>
+                </button>
+                <button onclick="showTab('calendar')" id="nav-calendar" class="bottom-nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <span>Calendar</span>
                 </button>
                 <button onclick="showTab('backtest')" id="nav-backtest" class="bottom-nav-item">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <span>Backtest</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span>Backtest</span>
                 </button>
                 <button onclick="showTab('tracker')" id="nav-tracker" class="bottom-nav-item">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>Trades</span>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Trades</span>
                 </button>
                 <button onclick="showTab('vix')" id="nav-vix" class="bottom-nav-item">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

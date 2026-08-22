@@ -40,7 +40,7 @@ function logout() {
 // ============ Navigation ============
 function showTab(tab) {
     // Hide all tabs
-    ['calculator', 'backtest', 'tracker', 'vix'].forEach(t => {
+    ['calculator', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
         document.getElementById(t + 'Tab').classList.add('hidden');
     });
     
@@ -55,6 +55,11 @@ function showTab(tab) {
     
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
+    
+    // Load calendar data if needed
+    if (tab === 'calendar') {
+        loadCalendarData();
+    }
 }
 
 function selectStrategy(strat) {
@@ -510,6 +515,147 @@ function updateVIXMonitor() {
         <div class="w-3 h-3 rounded-full ${currentVIX < 15 ? 'bg-green-400' : currentVIX < 20 ? 'bg-yellow-400' : 'bg-red-400'}"></div>
         <span class="text-lg font-semibold ${color}">${signal}</span>
     `;
+}
+
+// ============ Market Calendar ============
+function loadCalendarData() {
+    // Get current time
+    const now = new Date();
+    const usTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    const nzTime = new Date(now.toLocaleString('en-US', { timeZone: 'Pacific/Auckland' }));
+    
+    // Determine market status
+    const hours = usTime.getHours();
+    const minutes = usTime.getMinutes();
+    const timeNum = hours * 60 + minutes;
+    const isWeekday = usTime.getDay() > 0 && usTime.getDay() < 6;
+    
+    let status, statusColor;
+    if (!isWeekday) {
+        status = 'Closed (Weekend)';
+        statusColor = 'text-red-400';
+    } else if (timeNum < 240) { // 4:00 AM ET
+        status = 'Closed';
+        statusColor = 'text-red-400';
+    } else if (timeNum < 570) { // 9:30 AM ET
+        status = 'Pre-Market';
+        statusColor = 'text-yellow-400';
+    } else if (timeNum < 960) { // 4:00 PM ET
+        status = 'Open';
+        statusColor = 'text-green-400';
+    } else if (timeNum < 1200) { // 8:00 PM ET
+        status = 'After Hours';
+        statusColor = 'text-orange-400';
+    } else {
+        status = 'Closed';
+        statusColor = 'text-red-400';
+    }
+    
+    document.getElementById('marketStatus').textContent = status;
+    document.getElementById('marketStatus').className = `text-xl font-bold ${statusColor}`;
+    document.getElementById('usTime').textContent = usTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET';
+    document.getElementById('nzTime').textContent = nzTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Pacific/Auckland' }) + ' NZST';
+    
+    // Load upcoming events
+    loadUpcomingEvents();
+}
+
+function loadUpcomingEvents() {
+    const events = getUpcomingEvents();
+    const container = document.getElementById('upcomingEvents');
+    const count = document.getElementById('eventCount');
+    
+    count.textContent = `${events.length} events`;
+    
+    container.innerHTML = events.slice(0, 8).map(event => {
+        const date = new Date(event.date);
+        const isToday = date.toDateString() === new Date().toDateString();
+        const isTomorrow = date.toDateString() === new Date(Date.now() + 86400000).toDateString();
+        
+        let dateLabel = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        if (isToday) dateLabel = 'Today';
+        if (isTomorrow) dateLabel = 'Tomorrow';
+        
+        const typeColors = {
+            'holiday': 'bg-red-500',
+            'fomc': 'bg-blue-500',
+            'NFP': 'bg-green-500',
+            'CPI': 'bg-red-500',
+            'monthly_opex': 'bg-purple-500'
+        };
+        
+        return `
+            <div class="flex items-center space-x-3 py-2 border-b border-slate-700/50 last:border-0">
+                <div class="w-2 h-2 rounded-full ${typeColors[event.type] || 'bg-slate-400'}"></div>
+                <div class="flex-1">
+                    <p class="text-sm text-white">${event.name}</p>
+                    <p class="text-xs text-slate-400">${event.time || 'All Day'}</p>
+                </div>
+                <span class="text-xs ${isToday ? 'text-cyan-400 font-semibold' : 'text-slate-400'}">${dateLabel}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+function getUpcomingEvents() {
+    const now = new Date();
+    const events = [];
+    
+    // 2025 FOMC dates
+    const fomcDates = [
+        '2025-01-28', '2025-03-18', '2025-05-06', '2025-06-17',
+        '2025-07-29', '2025-09-16', '2025-10-28', '2025-12-16'
+    ];
+    
+    // CPI dates (2nd week of each month)
+    const cpiDates = [
+        '2025-01-15', '2025-02-12', '2025-03-12', '2025-04-10',
+        '2025-05-13', '2025-06-11', '2025-07-15', '2025-08-12',
+        '2025-09-10', '2025-10-14', '2025-11-12', '2025-12-10'
+    ];
+    
+    // NFP dates (1st Friday of each month)
+    const nfpDates = [
+        '2025-01-10', '2025-02-07', '2025-03-07', '2025-04-04',
+        '2025-05-02', '2025-06-06', '2025-07-03', '2025-08-01',
+        '2025-09-05', '2025-10-03', '2025-11-07', '2025-12-05'
+    ];
+    
+    // Options expiration (3rd Friday)
+    const opexDates = [
+        '2025-01-17', '2025-02-21', '2025-03-21', '2025-04-18',
+        '2025-05-16', '2025-06-20', '2025-07-18', '2025-08-15',
+        '2025-09-19', '2025-10-17', '2025-11-21', '2025-12-19'
+    ];
+    
+    // Holidays
+    const holidays = [
+        { date: '2025-01-01', name: "New Year's Day" },
+        { date: '2025-01-20', name: "MLK Day" },
+        { date: '2025-02-17', name: "Presidents' Day" },
+        { date: '2025-04-18', name: "Good Friday" },
+        { date: '2025-05-26', name: "Memorial Day" },
+        { date: '2025-06-19', name: "Juneteenth" },
+        { date: '2025-07-04', name: "Independence Day" },
+        { date: '2025-09-01', name: "Labor Day" },
+        { date: '2025-11-27', name: "Thanksgiving" },
+        { date: '2025-12-25', name: "Christmas" }
+    ];
+    
+    // Add all events
+    fomcDates.forEach(d => events.push({ date: d, type: 'fomc', name: 'FOMC Meeting', time: '2:00 PM ET' }));
+    cpiDates.forEach(d => events.push({ date: d, type: 'CPI', name: 'CPI Report', time: '8:30 AM ET' }));
+    nfpDates.forEach(d => events.push({ date: d, type: 'NFP', name: 'NFP (Jobs Report)', time: '8:30 AM ET' }));
+    opexDates.forEach(d => events.push({ date: d, type: 'monthly_opex', name: 'Options Expiration', time: 'Close' }));
+    holidays.forEach(h => events.push({ ...h, type: 'holiday', name: h.name, time: 'Market Closed' }));
+    
+    // Filter to future events and sort
+    const futureEvents = events
+        .filter(e => new Date(e.date) >= now)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 10);
+    
+    return futureEvents;
 }
 
 function updateVIXChart() {

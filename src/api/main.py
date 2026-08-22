@@ -14,6 +14,7 @@ from ..engine.strategies import StrategyTemplates
 from ..engine.backtest import BacktestEngine
 from ..engine.tracker import TradeTracker
 from ..engine.vix_monitor import VIXMonitor
+from ..engine.market_calendar import MarketCalendar
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -193,6 +194,27 @@ class VIXReadingResponse(BaseModel):
     value: float
     signal: str
     interpretation: str
+
+
+class MarketStatusResponse(BaseModel):
+    status: str
+    status_label: str
+    us_time: str
+    nz_time: Optional[str]
+    next_event: Optional[str]
+    is_trading_day: bool
+    is_holiday: bool
+
+
+class CalendarEventResponse(BaseModel):
+    date: str
+    type: str
+    name: str
+    importance: str
+    market_closed: Optional[bool]
+    time: Optional[str]
+    day_name: Optional[str]
+    days_until: Optional[int]
 
 
 # ============ API Endpoints ============
@@ -497,6 +519,51 @@ async def get_vix_history(days: int = 30):
 async def record_vix_reading(value: Optional[float] = None):
     """Record a VIX reading"""
     return vix_monitor.record_reading(value)
+
+
+# ============ Market Calendar Endpoints ============
+
+calendar = MarketCalendar()
+
+
+@app.get("/api/market/status", response_model=MarketStatusResponse)
+async def get_market_status():
+    """Get current market status"""
+    return calendar.get_market_status()
+
+
+@app.get("/api/market/holidays")
+async def get_holidays(year: int = 2025):
+    """Get market holidays"""
+    return calendar.get_holidays(year)
+
+
+@app.get("/api/market/fomc")
+async def get_fomc_dates(year: int = 2025):
+    """Get FOMC meeting dates"""
+    return calendar.get_fomc_dates(year)
+
+
+@app.get("/api/market/events", response_model=List[CalendarEventResponse])
+async def get_calendar_events(month: int = None, year: int = None):
+    """Get calendar events for a month"""
+    if month is None:
+        month = datetime.now().month
+    if year is None:
+        year = datetime.now().year
+    return calendar.get_calendar_events(month, year)
+
+
+@app.get("/api/market/upcoming", response_model=List[CalendarEventResponse])
+async def get_upcoming_events(days: int = 7):
+    """Get upcoming events"""
+    return calendar.get_upcoming_events(days)
+
+
+@app.get("/api/market/hours-nz")
+async def get_market_hours_nz():
+    """Get market hours in NZ time"""
+    return calendar.get_market_hours_nz()
 
 
 if __name__ == "__main__":
