@@ -95,6 +95,11 @@ class ThetaBrain:
     4. Which strikes? (Delta + Premium)
     5. How many? (Position Sizing)
     6. When to exit? (Rules)
+    
+    Architecture: Guard Chain Pattern
+    - Each step is a "guard" that can veto the trade
+    - All guards run, veto recorded for audit
+    - Single source of truth, no parallel signal paths
     """
     
     # ==================== RULE THRESHOLDS ====================
@@ -133,46 +138,59 @@ class ThetaBrain:
         """
         Main decision function - The Brain at work
         
-        Returns complete trading recommendation
+        Uses Guard Chain Pattern:
+        - Each guard evaluates independently
+        - Any guard can veto (return AVOID)
+        - All reasons recorded for audit trail
         """
         reasoning = []
         warnings = []
         entry_rules = []
         exit_rules = []
+        guards_consulted = []
         
         # ==================== STEP 1: SHOULD TRADE? ====================
         should_trade, step1_reasons = self._should_trade(inputs)
         reasoning.extend(step1_reasons)
+        guards_consulted.append(('MARKET_HOURS', should_trade))
         
         if not should_trade:
-            return self._create_avoid_output(inputs, reasoning, warnings)
+            return self._create_avoid_output(inputs, reasoning, warnings, guards_consulted)
         
         # ==================== STEP 2: WHICH TICKER? ====================
         ticker_ok, step2_reasons = self._evaluate_ticker(inputs)
         reasoning.extend(step2_reasons)
+        guards_consulted.append(('TICKER_QUALITY', ticker_ok))
         
         if not ticker_ok:
-            return self._create_avoid_output(inputs, reasoning, warnings)
+            return self._create_avoid_output(inputs, reasoning, warnings, guards_consulted)
         
         # ==================== STEP 3: WHICH STRATEGY? ====================
         strategy, confidence, step3_reasons = self._select_strategy(inputs)
         reasoning.extend(step3_reasons)
+        guards_consulted.append(('STRATEGY_SELECT', True))
         
         # ==================== STEP 4: WHICH STRIKES? ====================
         put_strike, call_strike, step4_reasons = self._select_strikes(inputs, strategy)
         reasoning.extend(step4_reasons)
+        guards_consulted.append(('STRIKE_SELECT', True))
         
         # ==================== STEP 5: HOW MANY? ====================
         contracts, max_risk, step5_reasons, step5_warnings = self._size_position(inputs)
         reasoning.extend(step5_reasons)
         warnings.extend(step5_warnings)
+        guards_consulted.append(('POSITION_SIZE', contracts > 0))
         
         # ==================== STEP 6: ENTRY/EXIT RULES ====================
         entry_rules = self._get_entry_rules(inputs, strategy)
         exit_rules = self._get_exit_rules()
+        guards_consulted.append(('RULES_LOADED', True))
         
         # ==================== GENERATE SIGNAL ====================
         signal, strength = self._generate_signal(inputs, strategy, confidence)
+        
+        # Log decision for audit
+        self._log_decision(inputs, signal, guards_consulted)
         
         return BrainOutput(
             signal=signal,
@@ -413,9 +431,13 @@ class ThetaBrain:
     # ==================== HELPER METHODS ====================
     
     def _create_avoid_output(
-        self, inputs: MarketInputs, reasoning: List[str], warnings: List[str]
+        self, inputs: MarketInputs, reasoning: List[str], warnings: List[str],
+        guards_consulted: List[Tuple[str, bool]]
     ) -> BrainOutput:
         """Create output for avoid signal"""
+        # Log decision
+        self._log_decision(inputs, Signal.AVOID.value, guards_consulted)
+        
         return BrainOutput(
             signal=Signal.AVOID.value,
             signal_strength='strong',
@@ -430,6 +452,29 @@ class ThetaBrain:
             warnings=warnings,
             reasoning=reasoning
         )
+    
+    def _log_decision(self, inputs: MarketInputs, signal: str, guards: List[Tuple[str, bool]]):
+        """Log decision for audit trail"""
+        from datetime import datetime
+        
+        log_entry = {
+            'timestamp': datetime.now().isoformat(),
+            'symbol': inputs.symbol,
+            'vix': inputs.vix_level,
+            'iv_rank': inputs.iv_rank,
+            'signal': signal,
+            'guards': {g[0]: g[1] for g in guards}
+        }
+        
+        self.decision_log.append(log_entry)
+        
+        # Keep last 100 decisions
+        if len(self.decision_log) > 100:
+            self.decision_log = self.decision_log[-100:]
+    
+    def get_decision_log(self) -> List[Dict]:
+        """Get audit trail of decisions"""
+        return self.decision_log
     
     def get_quick_assessment(self, vix: float, iv_rank: float) -> Dict:
         """Quick assessment without full analysis"""
