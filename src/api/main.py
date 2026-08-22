@@ -13,6 +13,7 @@ from ..engine.black_scholes import black_scholes, calculate_greeks, implied_vola
 from ..engine.strategies import StrategyTemplates
 from ..engine.backtest import BacktestEngine
 from ..engine.tracker import TradeTracker
+from ..engine.vix_monitor import VIXMonitor
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -166,6 +167,32 @@ class PortfolioSummary(BaseModel):
     profit_factor: float
     best_trade: Optional[Dict]
     worst_trade: Optional[Dict]
+
+
+class VIXResponse(BaseModel):
+    current: float
+    avg_7d: float
+    avg_30d: float
+    min_30d: float
+    max_30d: float
+    signal: str
+    interpretation: str
+    readings_count: int
+
+
+class EntrySignalResponse(BaseModel):
+    signal: str
+    confidence: str
+    message: str
+    strategies: List[str]
+    color: str
+
+
+class VIXReadingResponse(BaseModel):
+    timestamp: str
+    value: float
+    signal: str
+    interpretation: str
 
 
 # ============ API Endpoints ============
@@ -440,6 +467,36 @@ async def get_portfolio_summary():
 async def get_strategy_breakdown():
     """Get performance breakdown by strategy"""
     return tracker.get_strategy_breakdown()
+
+
+# ============ VIX Monitor Endpoints ============
+
+vix_monitor = VIXMonitor()
+
+
+@app.get("/api/vix", response_model=VIXResponse)
+async def get_vix():
+    """Get current VIX data and statistics"""
+    reading = vix_monitor.record_reading()
+    return vix_monitor.get_statistics()
+
+
+@app.get("/api/vix/signal", response_model=EntrySignalResponse)
+async def get_entry_signal():
+    """Get entry signal for Ravish's strategies"""
+    return vix_monitor.get_entry_signal()
+
+
+@app.get("/api/vix/history", response_model=List[VIXReadingResponse])
+async def get_vix_history(days: int = 30):
+    """Get VIX readings history"""
+    return vix_monitor.get_readings_history(days)
+
+
+@app.post("/api/vix/record", response_model=VIXReadingResponse)
+async def record_vix_reading(value: Optional[float] = None):
+    """Record a VIX reading"""
+    return vix_monitor.record_reading(value)
 
 
 if __name__ == "__main__":

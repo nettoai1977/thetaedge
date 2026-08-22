@@ -567,3 +567,137 @@ function updateTrackerUI() {
 
 // Initialize tracker on load
 loadTrades();
+
+// VIX Monitor functions
+let vixChart = null;
+
+function updateVIXMonitor() {
+    // Simulated VIX data
+    const currentVIX = 18.5 + (Math.random() - 0.5) * 4;
+    const avg7d = 17.8;
+    const avg30d = 19.2;
+    const min30d = 14.5;
+    const max30d = 24.8;
+    
+    // Update display
+    document.getElementById('vixValue').textContent = currentVIX.toFixed(1);
+    document.getElementById('vixAvg7d').textContent = avg7d.toFixed(1);
+    document.getElementById('vixAvg30d').textContent = avg30d.toFixed(1);
+    document.getElementById('vixMin30d').textContent = min30d.toFixed(1);
+    document.getElementById('vixMax30d').textContent = max30d.toFixed(1);
+    
+    // Determine signal
+    let signal, signalColor, interpretation;
+    if (currentVIX < 15) {
+        signal = 'ENTER';
+        signalColor = 'text-green-400';
+        interpretation = 'Low - Good for selling premium';
+    } else if (currentVIX < 20) {
+        signal = 'HOLD';
+        signalColor = 'text-yellow-400';
+        interpretation = 'Normal - Acceptable conditions';
+    } else if (currentVIX < 25) {
+        signal = 'CAUTION';
+        signalColor = 'text-orange-400';
+        interpretation = 'High - Wait for better entry';
+    } else {
+        signal = 'WAIT';
+        signalColor = 'text-red-400';
+        interpretation = 'Very High - Avoid new positions';
+    }
+    
+    document.getElementById('vixInterpretation').textContent = interpretation;
+    document.getElementById('vixSignal').innerHTML = `
+        <p class="text-slate-400 text-sm">Signal</p>
+        <p class="text-2xl font-bold ${signalColor}">${signal}</p>
+    `;
+    
+    // Update entry signal card
+    const entrySignal = document.getElementById('entrySignal');
+    const signalStrategies = document.getElementById('signalStrategies');
+    
+    if (currentVIX < 15) {
+        entrySignal.innerHTML = `
+            <div class="w-4 h-4 rounded-full bg-green-400"></div>
+            <span class="text-white font-semibold">ENTER</span>
+            <span class="text-green-400">- Excellent entry for Double Calendar</span>
+        `;
+        signalStrategies.innerHTML = 'Recommended: <span class="text-green-400">Double Calendar</span>, <span class="text-green-400">Time Spread</span>';
+    } else if (currentVIX < 20) {
+        entrySignal.innerHTML = `
+            <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+            <span class="text-white font-semibold">HOLD</span>
+            <span class="text-yellow-400">- Normal conditions, selective entries</span>
+        `;
+        signalStrategies.innerHTML = 'Recommended: <span class="text-yellow-400">Time Spread</span>';
+    } else {
+        entrySignal.innerHTML = `
+            <div class="w-4 h-4 rounded-full bg-red-400"></div>
+            <span class="text-white font-semibold">WAIT</span>
+            <span class="text-red-400">- High volatility, wait for better entry</span>
+        `;
+        signalStrategies.innerHTML = 'Consider: <span class="text-orange-400">Double Diagonal</span> (lower Vega risk)';
+    }
+    
+    // Update VIX chart
+    updateVIXChart();
+}
+
+function updateVIXChart() {
+    const ctx = document.getElementById('vixChart').getContext('2d');
+    if (vixChart) vixChart.destroy();
+    
+    // Generate synthetic VIX history
+    const labels = [];
+    const data = [];
+    const now = new Date();
+    
+    for (let i = 29; i >= 0; i--) {
+        const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        data.push(18 + Math.random() * 6 - 3);
+    }
+    
+    vixChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'VIX',
+                data: data,
+                borderColor: '#F59E0B',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                fill: true,
+                pointRadius: 0,
+                borderWidth: 2,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (item) => `VIX: ${item.raw.toFixed(1)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#94A3B8', maxTicksLimit: 10 },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                },
+                y: {
+                    title: { display: true, text: 'VIX', color: '#94A3B8' },
+                    ticks: { color: '#94A3B8' },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                }
+            }
+        }
+    });
+}
+
+// Initialize VIX monitor
+updateVIXMonitor();

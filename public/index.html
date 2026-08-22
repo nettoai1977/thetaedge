@@ -67,6 +67,7 @@
                         <button onclick="showTab('calculator')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Calculator</button>
                         <button onclick="showTab('backtest')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Backtest</button>
                         <button onclick="showTab('tracker')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Tracker</button>
+                        <button onclick="showTab('vix')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">VIX</button>
                         <button onclick="showTab('strategies')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Strategies</button>
                         <button onclick="logout()" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Sign Out</button>
                     </div>
@@ -260,6 +261,107 @@
                     <h3 class="text-lg font-semibold text-white mb-4">Trade History</h3>
                     <div id="tradeHistory" class="space-y-3">
                         <p class="text-slate-400 text-center">No closed trades</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIX Monitor Tab -->
+            <div id="vixTab" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-6">VIX Monitor</h1>
+                
+                <!-- Current VIX -->
+                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-slate-400 text-sm">Current VIX</p>
+                            <p id="vixValue" class="text-4xl font-bold text-white">--</p>
+                            <p id="vixInterpretation" class="text-slate-400 mt-1">Loading...</p>
+                        </div>
+                        <div id="vixSignal" class="text-right">
+                            <p class="text-slate-400 text-sm">Signal</p>
+                            <p class="text-2xl font-bold text-yellow-400">HOLD</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entry Signal -->
+                <div id="entrySignalCard" class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Entry Signal for Ravish's Strategies</h3>
+                    <div id="entrySignal" class="flex items-center space-x-4">
+                        <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+                        <span class="text-white">Loading signal...</span>
+                    </div>
+                    <div id="signalStrategies" class="mt-4 text-slate-400 text-sm"></div>
+                </div>
+
+                <!-- VIX Statistics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                        <p class="text-slate-400 text-xs">7-Day Avg</p>
+                        <p id="vixAvg7d" class="text-xl font-bold text-white">--</p>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                        <p class="text-slate-400 text-xs">30-Day Avg</p>
+                        <p id="vixAvg30d" class="text-xl font-bold text-white">--</p>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                        <p class="text-slate-400 text-xs">30-Day Low</p>
+                        <p id="vixMin30d" class="text-xl font-bold text-green-400">--</p>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
+                        <p class="text-slate-400 text-xs">30-Day High</p>
+                        <p id="vixMax30d" class="text-xl font-bold text-red-400">--</p>
+                    </div>
+                </div>
+
+                <!-- VIX Zones -->
+                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">VIX Zones Guide</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">< 12</div>
+                            <div class="flex-1 h-6 bg-green-500/30 rounded flex items-center px-3">
+                                <span class="text-green-400 text-sm">Very Low - Excellent for selling</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">12-15</div>
+                            <div class="flex-1 h-6 bg-green-400/30 rounded flex items-center px-3">
+                                <span class="text-green-400 text-sm">Low - Good for selling</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">15-20</div>
+                            <div class="flex-1 h-6 bg-yellow-400/30 rounded flex items-center px-3">
+                                <span class="text-yellow-400 text-sm">Normal - Acceptable (Ravish's target)</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">20-25</div>
+                            <div class="flex-1 h-6 bg-orange-400/30 rounded flex items-center px-3">
+                                <span class="text-orange-400 text-sm">High - Caution</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">25-30</div>
+                            <div class="flex-1 h-6 bg-red-400/30 rounded flex items-center px-3">
+                                <span class="text-red-400 text-sm">Very High - Avoid new positions</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-24 text-sm text-slate-400">> 30</div>
+                            <div class="flex-1 h-6 bg-red-600/30 rounded flex items-center px-3">
+                                <span class="text-red-400 text-sm">Extreme - Market stress</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIX History Chart -->
+                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-semibold text-white mb-4">VIX History</h3>
+                    <div style="height: 250px;">
+                        <canvas id="vixChart"></canvas>
                     </div>
                 </div>
             </div>
