@@ -2,408 +2,597 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
     <title>ThetaEdge - Options Trading Toolkit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="manifest" href="manifest.json">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
-        .card-glow { box-shadow: 0 0 40px rgba(6, 182, 212, 0.1); }
-        .btn-primary { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); transition: all 0.3s ease; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); }
-        .input-focus:focus { box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3); }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .hidden { display: none !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            overscroll-behavior: none;
+        }
+        
+        html { height: -webkit-fill-available; }
+        
+        /* Mobile-first touch targets */
+        .touch-target { 
+            min-height: 48px; 
+            min-width: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Bottom navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 8px 0;
+            padding-bottom: max(8px, env(safe-area-inset-bottom));
+            z-index: 50;
+        }
+        
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            color: #94A3B8;
+            transition: all 0.2s;
+            border-radius: 12px;
+            min-width: 64px;
+        }
+        
+        .bottom-nav-item.active {
+            color: #06B6D4;
+            background: rgba(6, 182, 212, 0.1);
+        }
+        
+        .bottom-nav-item svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .bottom-nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+        }
+        
+        /* Mobile-optimized cards */
+        .mobile-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Large touch-friendly buttons */
+        .btn-mobile {
+            height: 56px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary-mobile {
+            background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+        }
+        
+        .btn-primary-mobile:active {
+            transform: scale(0.98);
+        }
+        
+        /* Mobile input fields */
+        .input-mobile {
+            height: 52px;
+            border-radius: 12px;
+            font-size: 16px;
+            padding: 0 16px;
+        }
+        
+        /* Swipe indicator */
+        .swipe-indicator {
+            width: 40px;
+            height: 4px;
+            background: rgba(148, 163, 184, 0.3);
+            border-radius: 2px;
+            margin: 8px auto;
+        }
+        
+        /* Status bar spacing */
+        .safe-top {
+            padding-top: max(16px, env(safe-area-inset-top));
+        }
+        
+        /* Bottom content padding */
+        .content-bottom {
+            padding-bottom: 100px;
+        }
+        
+        /* Fade animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Slide up animation */
+        .slide-up {
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Hide scrollbar but keep functionality */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Pulse animation for live data */
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #22C55E;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
+<body class="text-white">
     <!-- Login Screen -->
-    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
-        <div class="w-full max-w-md">
-            <div class="text-center mb-8 fade-in">
-                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-cyan-500/20 mb-4">
-                    <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                    </svg>
+    <div id="loginScreen" class="min-h-screen flex flex-col safe-top">
+        <div class="flex-1 flex items-center justify-center px-6">
+            <div class="w-full max-w-sm">
+                <!-- Logo -->
+                <div class="text-center mb-10 fade-in">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                        <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">ThetaEdge</h1>
+                    <p class="text-slate-400">Options Trading Toolkit</p>
                 </div>
-                <h1 class="text-3xl font-bold text-white mb-2">ThetaEdge</h1>
-                <p class="text-slate-400">Options Trading Toolkit</p>
-            </div>
-            <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-8 card-glow border border-slate-700/50 fade-in">
-                <h2 class="text-xl font-semibold text-white mb-6 text-center">Sign In</h2>
-                <form id="loginForm" class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Username</label>
-                        <input type="text" id="username" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 input-focus focus:outline-none focus:border-cyan-500 transition-all" placeholder="Enter username">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
-                        <input type="password" id="password" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 input-focus focus:outline-none focus:border-cyan-500 transition-all" placeholder="Enter password">
-                    </div>
-                    <div id="errorMsg" class="hidden text-red-400 text-sm text-center"></div>
-                    <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">Sign In</button>
-                </form>
+                
+                <!-- Login Form -->
+                <div class="mobile-card slide-up">
+                    <form id="loginForm" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                            <input 
+                                type="text" 
+                                id="username" 
+                                required
+                                class="w-full input-mobile bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                                placeholder="Enter username"
+                                autocomplete="username"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                            <input 
+                                type="password" 
+                                id="password" 
+                                required
+                                class="w-full input-mobile bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+                                placeholder="Enter password"
+                                autocomplete="current-password"
+                            >
+                        </div>
+                        
+                        <div id="errorMsg" class="hidden text-red-400 text-sm text-center py-2"></div>
+                        
+                        <button 
+                            type="submit"
+                            class="w-full btn-mobile btn-primary-mobile"
+                        >
+                            Sign In
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Dashboard -->
-    <div id="dashboard" class="hidden min-h-screen">
-        <nav class="bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                            </svg>
-                        </div>
-                        <span class="text-xl font-bold text-white">ThetaEdge</span>
+    <div id="dashboard" class="hidden min-h-screen safe-top content-bottom">
+        <!-- Header -->
+        <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50">
+            <div class="flex items-center justify-between px-4 h-14">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <button onclick="showTab('calculator')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Calculator</button>
-                        <button onclick="showTab('backtest')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Backtest</button>
-                        <button onclick="showTab('tracker')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Tracker</button>
-                        <button onclick="showTab('vix')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">VIX</button>
-                        <button onclick="showTab('strategies')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Strategies</button>
-                        <button onclick="logout()" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Sign Out</button>
-                    </div>
+                    <span class="text-lg font-bold text-white">ThetaEdge</span>
                 </div>
+                <button onclick="logout()" class="touch-target text-slate-400 hover:text-white">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                </button>
             </div>
-        </nav>
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        </header>
+
+        <!-- Main Content -->
+        <main class="px-4 py-6">
             <!-- Calculator Tab -->
             <div id="calculatorTab">
-                <h1 class="text-2xl font-bold text-white mb-6">Strategy Calculator</h1>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Input Panel -->
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-white mb-4">Configuration</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm text-slate-400 mb-1">Stock Price ($)</label>
-                                <input type="number" id="stockPrice" value="550" step="0.01" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Put Strike ($)</label>
-                                    <input type="number" id="putStrike" value="500" step="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Call Strike ($)</label>
-                                    <input type="number" id="callStrike" value="600" step="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Short Days</label>
-                                    <input type="number" id="shortDays" value="14" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Long Days</label>
-                                    <input type="number" id="longDays" value="30" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-slate-400 mb-1">Implied Volatility (%)</label>
-                                <input type="number" id="iv" value="20" step="0.1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-sm text-slate-400 mb-1">Strategy</label>
-                                <select id="strategyType" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                    <option value="double_calendar">Double Calendar</option>
-                                    <option value="calendar_call">Calendar Call</option>
-                                    <option value="calendar_put">Calendar Put</option>
-                                </select>
-                            </div>
-                            <button onclick="calculateStrategy()" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">Calculate</button>
-                        </div>
-                    </div>
-                    <!-- Results Panel -->
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-white mb-4">Results</h3>
-                        <div id="results" class="space-y-4">
-                            <p class="text-slate-400 text-center">Click Calculate to see results</p>
-                        </div>
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">Calculator</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="pulse-dot"></div>
+                        <span class="text-xs text-slate-400">Live</span>
                     </div>
                 </div>
-                <!-- Chart -->
-                <div class="mt-6 bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                    <h3 class="text-lg font-semibold text-white mb-4">Payoff Diagram</h3>
-                    <div style="height: 300px;">
-                        <canvas id="payoffChart"></canvas>
+                
+                <!-- Stock Price Input -->
+                <div class="mobile-card mb-4 slide-up">
+                    <label class="block text-sm text-slate-400 mb-2">Stock Price</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">$</span>
+                        <input 
+                            type="number" 
+                            id="stockPrice" 
+                            value="550" 
+                            step="0.01" 
+                            class="w-full pl-8 pr-4 h-14 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-2xl font-bold input-mobile focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Strikes -->
+                <div class="grid grid-cols-2 gap-3 mb-4 slide-up">
+                    <div class="mobile-card">
+                        <label class="block text-xs text-slate-400 mb-2">Put Strike</label>
+                        <input 
+                            type="number" 
+                            id="putStrike" 
+                            value="500" 
+                            step="1" 
+                            class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-lg font-semibold text-center input-mobile focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+                    <div class="mobile-card">
+                        <label class="block text-xs text-slate-400 mb-2">Call Strike</label>
+                        <input 
+                            type="number" 
+                            id="callStrike" 
+                            value="600" 
+                            step="1" 
+                            class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-lg font-semibold text-center input-mobile focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+                </div>
+                
+                <!-- Time & IV -->
+                <div class="grid grid-cols-2 gap-3 mb-4 slide-up">
+                    <div class="mobile-card">
+                        <label class="block text-xs text-slate-400 mb-2">Short Days</label>
+                        <input 
+                            type="number" 
+                            id="shortDays" 
+                            value="14" 
+                            class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-lg font-semibold text-center input-mobile focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+                    <div class="mobile-card">
+                        <label class="block text-xs text-slate-400 mb-2">Long Days</label>
+                        <input 
+                            type="number" 
+                            id="longDays" 
+                            value="30" 
+                            class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-lg font-semibold text-center input-mobile focus:outline-none focus:border-cyan-500"
+                        >
+                    </div>
+                </div>
+                
+                <!-- IV -->
+                <div class="mobile-card mb-4 slide-up">
+                    <div class="flex items-center justify-between mb-2">
+                        <label class="text-sm text-slate-400">Implied Volatility</label>
+                        <span id="ivDisplay" class="text-cyan-400 font-semibold">20%</span>
+                    </div>
+                    <input 
+                        type="range" 
+                        id="ivSlider" 
+                        min="5" 
+                        max="60" 
+                        value="20" 
+                        step="0.5"
+                        class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    >
+                    <div class="flex justify-between text-xs text-slate-500 mt-1">
+                        <span>5%</span>
+                        <span>60%</span>
+                    </div>
+                </div>
+                
+                <!-- Strategy Selector -->
+                <div class="mobile-card mb-6 slide-up">
+                    <label class="block text-sm text-slate-400 mb-3">Strategy</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectStrategy('double_calendar')" id="strat-dc" class="h-12 rounded-xl text-sm font-medium bg-cyan-500/20 text-cyan-400 border border-cyan-500/50">
+                            Double Calendar
+                        </button>
+                        <button onclick="selectStrategy('calendar_call')" id="strat-cc" class="h-12 rounded-xl text-sm font-medium bg-slate-700/50 text-slate-400 border border-slate-600">
+                            Calendar Call
+                        </button>
+                        <button onclick="selectStrategy('calendar_put')" id="strat-cp" class="h-12 rounded-xl text-sm font-medium bg-slate-700/50 text-slate-400 border border-slate-600">
+                            Calendar Put
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Calculate Button -->
+                <button onclick="calculateStrategy()" class="w-full btn-mobile btn-primary-mobile mb-6">
+                    Calculate Strategy
+                </button>
+                
+                <!-- Results -->
+                <div id="resultsSection" class="hidden">
+                    <div class="swipe-indicator"></div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div class="mobile-card text-center">
+                            <p class="text-xs text-slate-400 mb-1">Net Debit</p>
+                            <p id="resultDebit" class="text-xl font-bold text-white">$0</p>
+                        </div>
+                        <div class="mobile-card text-center">
+                            <p class="text-xs text-slate-400 mb-1">Max Profit</p>
+                            <p id="resultProfit" class="text-xl font-bold text-green-400">$0</p>
+                        </div>
+                        <div class="mobile-card text-center">
+                            <p class="text-xs text-slate-400 mb-1">Max Loss</p>
+                            <p id="resultLoss" class="text-xl font-bold text-red-400">$0</p>
+                        </div>
+                        <div class="mobile-card text-center">
+                            <p class="text-xs text-slate-400 mb-1">Risk/Reward</p>
+                            <p id="resultRR" class="text-xl font-bold text-cyan-400">1:0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Payoff Chart -->
+                    <div class="mobile-card mb-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-sm font-semibold text-white">Payoff Diagram</h3>
+                        </div>
+                        <div style="height: 200px;">
+                            <canvas id="payoffChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Position Legs -->
+                    <div class="mobile-card">
+                        <h3 class="text-sm font-semibold text-white mb-3">Position Legs</h3>
+                        <div id="legsList" class="space-y-2"></div>
                     </div>
                 </div>
             </div>
+            
             <!-- Backtest Tab -->
             <div id="backtestTab" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-6">Backtesting Engine</h1>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <!-- Backtest Config -->
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-white mb-4">Configuration</h3>
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Ticker</label>
-                                    <input type="text" id="btTicker" value="QQQ" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Capital ($)</label>
-                                    <input type="number" id="btCapital" value="100000" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Start Date</label>
-                                    <input type="date" id="btStart" value="2024-01-01" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">End Date</label>
-                                    <input type="date" id="btEnd" value="2024-12-31" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">IV (%)</label>
-                                    <input type="number" id="btIV" value="20" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-sm text-slate-400 mb-1">Take Profit (%)</label>
-                                    <input type="number" id="btTP" value="30" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                </div>
-                            </div>
-                            <button onclick="runBacktest()" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">Run Backtest</button>
+                <h1 class="text-2xl font-bold text-white mb-6">Backtest</h1>
+                
+                <div class="mobile-card mb-4">
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2">Ticker</label>
+                            <input type="text" id="btTicker" value="QQQ" class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-center input-mobile focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2">Capital</label>
+                            <input type="number" id="btCapital" value="100000" class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white text-center input-mobile focus:outline-none focus:border-cyan-500">
                         </div>
                     </div>
-                    <!-- Backtest Results -->
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-white mb-4">Results</h3>
-                        <div id="btResults" class="space-y-4">
-                            <p class="text-slate-400 text-center">Click Run Backtest to see results</p>
+                    <div class="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2">Start</label>
+                            <input type="date" id="btStart" value="2024-01-01" class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white input-mobile focus:outline-none focus:border-cyan-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-2">End</label>
+                            <input type="date" id="btEnd" value="2024-12-31" class="w-full h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white input-mobile focus:outline-none focus:border-cyan-500">
                         </div>
                     </div>
+                    <button onclick="runBacktest()" class="w-full btn-mobile btn-primary-mobile">Run Backtest</button>
                 </div>
-                <!-- Equity Curve -->
-                <div class="mt-6 bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                    <h3 class="text-lg font-semibold text-white mb-4">Equity Curve</h3>
-                    <div style="height: 300px;">
-                        <canvas id="equityChart"></canvas>
-                    </div>
+                
+                <div id="btResults" class="space-y-3">
+                    <p class="text-slate-400 text-center">Configure and run backtest</p>
                 </div>
             </div>
-
-            <!-- Trade Tracker Tab -->
+            
+            <!-- Tracker Tab -->
             <div id="trackerTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">Trade Tracker</h1>
                 
                 <!-- Portfolio Summary -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">Total Trades</p>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">Total Trades</p>
                         <p id="totalTrades" class="text-2xl font-bold text-white">0</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">Win Rate</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">Win Rate</p>
                         <p id="winRate" class="text-2xl font-bold text-green-400">0%</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">Total P&L</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">Total P&L</p>
                         <p id="totalPnl" class="text-2xl font-bold text-cyan-400">$0</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">Open Positions</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">Open</p>
                         <p id="openPositions" class="text-2xl font-bold text-yellow-400">0</p>
                     </div>
                 </div>
-
-                <!-- Add Trade Form -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-                    <h3 class="text-lg font-semibold text-white mb-4">Add Trade</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-sm text-slate-400 mb-1">Ticker</label>
-                            <input type="text" id="tradeTicker" value="QQQ" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                
+                <!-- Add Trade -->
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Add Trade</h3>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="tradeTicker" value="QQQ" placeholder="Ticker" class="h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white px-4 input-mobile focus:outline-none focus:border-cyan-500">
+                            <input type="number" id="tradeDebit" placeholder="Net Debit" step="0.01" class="h-12 bg-slate-900/50 border border-slate-600 rounded-xl text-white px-4 input-mobile focus:outline-none focus:border-cyan-500">
                         </div>
-                        <div>
-                            <label class="block text-sm text-slate-400 mb-1">Strategy</label>
-                            <select id="tradeStrategy" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                                <option value="Double Calendar">Double Calendar</option>
-                                <option value="Calendar Spread">Calendar Spread</option>
-                                <option value="Time Spread">Time Spread</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm text-slate-400 mb-1">Net Debit ($)</label>
-                            <input type="number" id="tradeDebit" step="0.01" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-sm text-slate-400 mb-1">Contracts</label>
-                            <input type="number" id="tradeContracts" value="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
-                        </div>
+                        <button onclick="addTrade()" class="w-full btn-mobile btn-primary-mobile">Add Trade</button>
                     </div>
-                    <button onclick="addTrade()" class="mt-4 px-6 py-2 btn-primary text-white font-semibold rounded-xl">Add Trade</button>
                 </div>
-
+                
                 <!-- Open Trades -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-                    <h3 class="text-lg font-semibold text-white mb-4">Open Positions</h3>
-                    <div id="openTrades" class="space-y-3">
-                        <p class="text-slate-400 text-center">No open trades</p>
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Open Positions</h3>
+                    <div id="openTrades" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">No open trades</p>
                     </div>
                 </div>
-
-                <!-- Trade History -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                    <h3 class="text-lg font-semibold text-white mb-4">Trade History</h3>
-                    <div id="tradeHistory" class="space-y-3">
-                        <p class="text-slate-400 text-center">No closed trades</p>
+                
+                <!-- History -->
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">Trade History</h3>
+                    <div id="tradeHistory" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">No closed trades</p>
                     </div>
                 </div>
             </div>
-
-            <!-- VIX Monitor Tab -->
+            
+            <!-- VIX Tab -->
             <div id="vixTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">VIX Monitor</h1>
                 
                 <!-- Current VIX -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-slate-400 text-sm">Current VIX</p>
-                            <p id="vixValue" class="text-4xl font-bold text-white">--</p>
-                            <p id="vixInterpretation" class="text-slate-400 mt-1">Loading...</p>
-                        </div>
-                        <div id="vixSignal" class="text-right">
-                            <p class="text-slate-400 text-sm">Signal</p>
-                            <p class="text-2xl font-bold text-yellow-400">HOLD</p>
-                        </div>
-                    </div>
+                <div class="mobile-card mb-4 text-center">
+                    <p class="text-sm text-slate-400 mb-2">Current VIX</p>
+                    <p id="vixValue" class="text-5xl font-bold text-white mb-2">--</p>
+                    <p id="vixInterpretation" class="text-sm text-slate-400">Loading...</p>
                 </div>
-
+                
                 <!-- Entry Signal -->
-                <div id="entrySignalCard" class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-                    <h3 class="text-lg font-semibold text-white mb-4">Entry Signal for Ravish's Strategies</h3>
-                    <div id="entrySignal" class="flex items-center space-x-4">
-                        <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+                <div id="entrySignalCard" class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Entry Signal</h3>
+                    <div id="entrySignal" class="flex items-center space-x-3">
+                        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
                         <span class="text-white">Loading signal...</span>
                     </div>
-                    <div id="signalStrategies" class="mt-4 text-slate-400 text-sm"></div>
                 </div>
-
-                <!-- VIX Statistics -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">7-Day Avg</p>
-                        <p id="vixAvg7d" class="text-xl font-bold text-white">--</p>
+                
+                <!-- VIX Stats -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">7-Day Avg</p>
+                        <p id="vixAvg7d" class="text-lg font-bold text-white">--</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">30-Day Avg</p>
-                        <p id="vixAvg30d" class="text-xl font-bold text-white">--</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">30-Day Avg</p>
+                        <p id="vixAvg30d" class="text-lg font-bold text-white">--</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">30-Day Low</p>
-                        <p id="vixMin30d" class="text-xl font-bold text-green-400">--</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">30-Day Low</p>
+                        <p id="vixMin30d" class="text-lg font-bold text-green-400">--</p>
                     </div>
-                    <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/50">
-                        <p class="text-slate-400 text-xs">30-Day High</p>
-                        <p id="vixMax30d" class="text-xl font-bold text-red-400">--</p>
+                    <div class="mobile-card text-center">
+                        <p class="text-xs text-slate-400 mb-1">30-Day High</p>
+                        <p id="vixMax30d" class="text-lg font-bold text-red-400">--</p>
                     </div>
                 </div>
-
+                
                 <!-- VIX Zones -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50 mb-6">
-                    <h3 class="text-lg font-semibold text-white mb-4">VIX Zones Guide</h3>
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">< 12</div>
-                            <div class="flex-1 h-6 bg-green-500/30 rounded flex items-center px-3">
-                                <span class="text-green-400 text-sm">Very Low - Excellent for selling</span>
-                            </div>
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">VIX Zones</h3>
+                    <div class="space-y-2">
+                        <div class="flex items-center h-10 rounded-lg bg-green-500/20 px-3">
+                            <span class="text-xs text-slate-400 w-16">< 15</span>
+                            <span class="text-sm text-green-400">Good for selling</span>
                         </div>
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">12-15</div>
-                            <div class="flex-1 h-6 bg-green-400/30 rounded flex items-center px-3">
-                                <span class="text-green-400 text-sm">Low - Good for selling</span>
-                            </div>
+                        <div class="flex items-center h-10 rounded-lg bg-yellow-500/20 px-3">
+                            <span class="text-xs text-slate-400 w-16">15-20</span>
+                            <span class="text-sm text-yellow-400">Target zone</span>
                         </div>
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">15-20</div>
-                            <div class="flex-1 h-6 bg-yellow-400/30 rounded flex items-center px-3">
-                                <span class="text-yellow-400 text-sm">Normal - Acceptable (Ravish's target)</span>
-                            </div>
+                        <div class="flex items-center h-10 rounded-lg bg-orange-500/20 px-3">
+                            <span class="text-xs text-slate-400 w-16">20-25</span>
+                            <span class="text-sm text-orange-400">Caution</span>
                         </div>
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">20-25</div>
-                            <div class="flex-1 h-6 bg-orange-400/30 rounded flex items-center px-3">
-                                <span class="text-orange-400 text-sm">High - Caution</span>
-                            </div>
+                        <div class="flex items-center h-10 rounded-lg bg-red-500/20 px-3">
+                            <span class="text-xs text-slate-400 w-16">> 25</span>
+                            <span class="text-sm text-red-400">Avoid</span>
                         </div>
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">25-30</div>
-                            <div class="flex-1 h-6 bg-red-400/30 rounded flex items-center px-3">
-                                <span class="text-red-400 text-sm">Very High - Avoid new positions</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="w-24 text-sm text-slate-400">> 30</div>
-                            <div class="flex-1 h-6 bg-red-600/30 rounded flex items-center px-3">
-                                <span class="text-red-400 text-sm">Extreme - Market stress</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- VIX History Chart -->
-                <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                    <h3 class="text-lg font-semibold text-white mb-4">VIX History</h3>
-                    <div style="height: 250px;">
-                        <canvas id="vixChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Strategies Tab -->
-            <div id="strategiesTab" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-6">Strategy Guide</h1>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-cyan-400 mb-2">Double Calendar</h3>
-                        <p class="text-slate-400 text-sm mb-4">Primary strategy - 80% win rate. Sell near-term, buy far-term options.</p>
-                        <ul class="text-slate-400 text-sm space-y-1">
-                            <li>• Entry: VIX 15-20</li>
-                            <li>• Strikes: 10% OTM</li>
-                            <li>• Take profit: 20-40%</li>
-                            <li>• Stop loss: 30% mental</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-purple-400 mb-2">Time Spread</h3>
-                        <p class="text-slate-400 text-sm mb-4">Theta Machine - 300%+ potential. Earn theta daily.</p>
-                        <ul class="text-slate-400 text-sm space-y-1">
-                            <li>• Entry: 20-30 delta</li>
-                            <li>• Direction: Any</li>
-                            <li>• Risk $162, Reward $618</li>
-                            <li>• Exit before expiry</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
-                        <h3 class="text-lg font-semibold text-green-400 mb-2">Double Diagonal</h3>
-                        <p class="text-slate-400 text-sm mb-4">Wide range play. Lower Vega risk than double calendar.</p>
-                        <ul class="text-slate-400 text-sm space-y-1">
-                            <li>• Entry: VIX > 20</li>
-                            <li>• Use when IV high</li>
-                            <li>• Wider profit zone</li>
-                            <li>• Lower Vega exposure</li>
-                        </ul>
                     </div>
                 </div>
             </div>
         </main>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="flex justify-around items-center max-w-lg mx-auto">
+                <button onclick="showTab('calculator')" id="nav-calculator" class="bottom-nav-item active">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Calc</span>
+                </button>
+                <button onclick="showTab('backtest')" id="nav-backtest" class="bottom-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    <span>Backtest</span>
+                </button>
+                <button onclick="showTab('tracker')" id="nav-tracker" class="bottom-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>Trades</span>
+                </button>
+                <button onclick="showTab('vix')" id="nav-vix" class="bottom-nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span>VIX</span>
+                </button>
+            </div>
+        </nav>
     </div>
+
     <script src="app.js"></script>
 </body>
 </html>
