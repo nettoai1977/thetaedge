@@ -17,6 +17,7 @@ from ..engine.vix_monitor import VIXMonitor
 from ..engine.market_calendar import MarketCalendar
 from ..engine.ticker_scanner import TickerScanner
 from ..engine.position_sizer import PositionSizer
+from ..engine.theta_brain import ThetaBrain, MarketInputs
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -257,6 +258,37 @@ class PositionSizeResponse(BaseModel):
     total_risk: float
     risk_remaining: float
     recommendation: str
+
+
+class BrainAnalyzeRequest(BaseModel):
+    vix_level: float
+    vix_trend: str = "stable"
+    symbol: str = "QQQ"
+    price: float = 500
+    iv_rank: float = 40
+    volume: int = 10000000
+    avg_volume: int = 15000000
+    days_to_fomc: Optional[int] = None
+    days_to_cpi: Optional[int] = None
+    days_to_earnings: Optional[int] = None
+    current_positions: int = 0
+    account_size: float = 10000
+    current_risk_pct: float = 5.0
+
+
+class BrainOutputResponse(BaseModel):
+    signal: str
+    signal_strength: str
+    recommended_strategy: str
+    strategy_confidence: str
+    suggested_put_strike: float
+    suggested_call_strike: float
+    recommended_contracts: int
+    max_risk_dollars: float
+    entry_rules: List[str]
+    exit_rules: List[str]
+    warnings: List[str]
+    reasoning: List[str]
 
 
 # ============ API Endpoints ============
@@ -645,6 +677,38 @@ async def calculate_position_size(request: PositionSizeRequest):
         max_loss_pct=request.max_loss_pct,
         risk_pct=request.risk_pct
     )
+
+
+# ============ ThetaBrain Endpoints ============
+
+brain = ThetaBrain()
+
+
+@app.post("/api/brain/analyze", response_model=BrainOutputResponse)
+async def analyze_trade(request: BrainAnalyzeRequest):
+    """Analyze trade with ThetaBrain"""
+    inputs = MarketInputs(
+        vix_level=request.vix_level,
+        vix_trend=request.vix_trend,
+        symbol=request.symbol,
+        price=request.price,
+        iv_rank=request.iv_rank,
+        volume=request.volume,
+        avg_volume=request.avg_volume,
+        days_to_fomc=request.days_to_fomc,
+        days_to_cpi=request.days_to_cpi,
+        days_to_earnings=request.days_to_earnings,
+        current_positions=request.current_positions,
+        account_size=request.account_size,
+        current_risk_pct=request.current_risk_pct
+    )
+    return brain.analyze(inputs)
+
+
+@app.get("/api/brain/quick")
+async def quick_assessment(vix: float = 18, iv_rank: float = 40):
+    """Quick brain assessment"""
+    return brain.get_quick_assessment(vix, iv_rank)
 
 
 if __name__ == "__main__":

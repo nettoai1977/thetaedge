@@ -574,6 +574,117 @@
             <div id="toolsTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">Trading Tools</h1>
                 
+                <!-- ThetaBrain -->
+                <div class="mobile-card mb-4 border-cyan-500/30">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center">
+                            <span class="text-white text-sm">🧠</span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-white">ThetaBrain</h3>
+                        <span class="text-xs px-2 py-0.5 bg-cyan-500/20 text-cyan-400 rounded">AI</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">Intelligent trading decision engine</p>
+                    
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">VIX Level</label>
+                                <input type="number" id="brainVix" value="18" step="0.1" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">IV Rank %</label>
+                                <input type="number" id="brainIvRank" value="45" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Symbol</label>
+                                <input type="text" id="brainSymbol" value="QQQ" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Price</label>
+                                <input type="number" id="brainPrice" value="482" step="0.01" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Days to FOMC</label>
+                                <input type="number" id="brainFomc" value="14" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Account Size</label>
+                                <input type="number" id="brainAccount" value="10000" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                            </div>
+                        </div>
+                        <button onclick="runThetaBrain()" class="w-full h-12 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-cyan-500/20">
+                            🧠 Analyze Trade
+                        </button>
+                    </div>
+                    
+                    <!-- Brain Output -->
+                    <div id="brainOutput" class="hidden mt-4 space-y-3">
+                        <!-- Signal -->
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400">Signal</span>
+                                <span id="brainSignal" class="text-lg font-bold"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Strategy -->
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-slate-400">Strategy</span>
+                                <span id="brainStrategy" class="text-sm font-semibold text-white"></span>
+                            </div>
+                            <div class="flex items-center justify-between mt-1">
+                                <span class="text-xs text-slate-400">Confidence</span>
+                                <span id="brainConfidence" class="text-xs text-slate-300"></span>
+                            </div>
+                        </div>
+                        
+                        <!-- Strikes -->
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div>
+                                    <p class="text-xs text-slate-400">Put Strike</p>
+                                    <p id="brainPutStrike" class="text-sm font-semibold text-white"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Call Strike</p>
+                                    <p id="brainCallStrike" class="text-sm font-semibold text-white"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Position -->
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div>
+                                    <p class="text-xs text-slate-400">Contracts</p>
+                                    <p id="brainContracts" class="text-sm font-semibold text-cyan-400"></p>
+                                </div>
+                                <div>
+                                    <p class="text-xs text-slate-400">Max Risk</p>
+                                    <p id="brainRisk" class="text-sm font-semibold text-red-400"></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Rules -->
+                        <div class="bg-slate-900/50 rounded-lg p-3">
+                            <p class="text-xs text-slate-400 mb-2">Entry Rules</p>
+                            <div id="brainEntryRules" class="space-y-1"></div>
+                        </div>
+                        
+                        <!-- Warnings -->
+                        <div id="brainWarnings" class="hidden bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                            <p class="text-xs text-red-400 mb-2">⚠️ Warnings</p>
+                            <div id="brainWarningList" class="space-y-1"></div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Options Chain -->
                 <div class="mobile-card mb-4">
                     <div class="flex items-center justify-between mb-3">

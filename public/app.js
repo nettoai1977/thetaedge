@@ -561,6 +561,107 @@ function calculatePosition() {
     if (navigator.vibrate) navigator.vibrate(10);
 }
 
+// ============ ThetaBrain ============
+function runThetaBrain() {
+    const vix = +document.getElementById('brainVix').value;
+    const ivRank = +document.getElementById('brainIvRank').value;
+    const symbol = document.getElementById('brainSymbol').value;
+    const price = +document.getElementById('brainPrice').value;
+    const fomc = +document.getElementById('brainFomc').value;
+    const account = +document.getElementById('brainAccount').value;
+    
+    // ThetaBrain decision logic
+    let signal, signalColor, strategy, confidence;
+    
+    // Step 1: VIX Regime
+    if (vix < 12) {
+        signal = '🟢 STRONG BUY';
+        signalColor = 'text-green-400';
+        strategy = 'Double Calendar';
+        confidence = 'HIGH';
+    } else if (vix < 15) {
+        signal = '🟢 BUY';
+        signalColor = 'text-green-400';
+        strategy = 'Double Calendar';
+        confidence = 'HIGH';
+    } else if (vix < 20) {
+        signal = '🟡 HOLD';
+        signalColor = 'text-yellow-400';
+        strategy = 'Calendar Spread';
+        confidence = 'MEDIUM';
+    } else if (vix < 25) {
+        signal = '🟠 WAIT';
+        signalColor = 'text-orange-400';
+        strategy = 'Double Diagonal';
+        confidence = 'LOW';
+    } else {
+        signal = '🔴 AVOID';
+        signalColor = 'text-red-400';
+        strategy = 'None';
+        confidence = 'NONE';
+    }
+    
+    // Step 2: FOMC check
+    let warnings = [];
+    if (fomc <= 2) {
+        warnings.push('FOMC in ' + fomc + ' days - wait');
+        signal = '🔴 WAIT';
+        signalColor = 'text-red-400';
+    }
+    
+    // Step 3: IV Rank check
+    if (ivRank < 20) {
+        warnings.push('IV Rank too low for selling');
+    }
+    
+    // Step 4: Strikes
+    const putStrike = Math.round(price * 0.90 / 5) * 5;
+    const callStrike = Math.round(price * 1.10 / 5) * 5;
+    
+    // Step 5: Position size
+    const riskPerTrade = account * 0.02;
+    const maxLoss = price * 0.02 * 100;
+    const contracts = Math.min(Math.floor(riskPerTrade / maxLoss), 5);
+    const totalRisk = contracts * maxLoss;
+    
+    // Update UI
+    document.getElementById('brainSignal').textContent = signal;
+    document.getElementById('brainSignal').className = `text-lg font-bold ${signalColor}`;
+    document.getElementById('brainStrategy').textContent = strategy;
+    document.getElementById('brainConfidence').textContent = `Confidence: ${confidence}`;
+    document.getElementById('brainPutStrike').textContent = `$${putStrike}`;
+    document.getElementById('brainCallStrike').textContent = `$${callStrike}`;
+    document.getElementById('brainContracts').textContent = contracts;
+    document.getElementById('brainRisk').textContent = `$${totalRisk.toLocaleString()}`;
+    
+    // Entry rules
+    const entryRules = [
+        `✓ VIX at ${vix} - ${vix < 15 ? 'Good' : vix < 20 ? 'Acceptable' : 'Caution'}`,
+        `✓ Use ${strategy} strategy`,
+        `✓ Strikes: Put $${putStrike} / Call $${callStrike}`,
+        `✓ Position size: ${contracts} contracts`,
+        '✓ Place limit order at mid-price',
+    ];
+    
+    document.getElementById('brainEntryRules').innerHTML = entryRules.map(r => 
+        `<p class="text-xs text-green-400">${r}</p>`
+    ).join('');
+    
+    // Warnings
+    if (warnings.length > 0) {
+        document.getElementById('brainWarnings').classList.remove('hidden');
+        document.getElementById('brainWarningList').innerHTML = warnings.map(w =>
+            `<p class="text-xs text-red-400">⚠️ ${w}</p>`
+        ).join('');
+    } else {
+        document.getElementById('brainWarnings').classList.add('hidden');
+    }
+    
+    document.getElementById('brainOutput').classList.remove('hidden');
+    
+    if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+}
+
 // ============ Tools Tab Functions ============
 
 // Options Chain
