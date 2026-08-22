@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThetaEdge - Options Trading Toolkit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); }
+        .card-glow { box-shadow: 0 0 40px rgba(6, 182, 212, 0.1); }
+        .btn-primary { background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); }
+        .input-focus:focus { box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.3); }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Login Screen -->
+    <div id="loginScreen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md">
+            <div class="text-center mb-8 fade-in">
+                <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-cyan-500/20 mb-4">
+                    <svg class="w-10 h-10 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    </svg>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">ThetaEdge</h1>
+                <p class="text-slate-400">Options Trading Toolkit</p>
+            </div>
+            <div class="bg-slate-800/50 backdrop-blur-xl rounded-2xl p-8 card-glow border border-slate-700/50 fade-in">
+                <h2 class="text-xl font-semibold text-white mb-6 text-center">Sign In</h2>
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Username</label>
+                        <input type="text" id="username" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 input-focus focus:outline-none focus:border-cyan-500 transition-all" placeholder="Enter username">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <input type="password" id="password" required class="w-full px-4 py-3 bg-slate-900/50 border border-slate-600 rounded-xl text-white placeholder-slate-500 input-focus focus:outline-none focus:border-cyan-500 transition-all" placeholder="Enter password">
+                    </div>
+                    <div id="errorMsg" class="hidden text-red-400 text-sm text-center"></div>
+                    <button type="submit" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">Sign In</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen">
+        <nav class="bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold text-white">ThetaEdge</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="showTab('calculator')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Calculator</button>
+                        <button onclick="showTab('strategies')" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Strategies</button>
+                        <button onclick="logout()" class="px-4 py-2 text-slate-400 hover:text-white transition-colors">Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Calculator Tab -->
+            <div id="calculatorTab">
+                <h1 class="text-2xl font-bold text-white mb-6">Strategy Calculator</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Input Panel -->
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                        <h3 class="text-lg font-semibold text-white mb-4">Configuration</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm text-slate-400 mb-1">Stock Price ($)</label>
+                                <input type="number" id="stockPrice" value="550" step="0.01" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-slate-400 mb-1">Put Strike ($)</label>
+                                    <input type="number" id="putStrike" value="500" step="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-slate-400 mb-1">Call Strike ($)</label>
+                                    <input type="number" id="callStrike" value="600" step="1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm text-slate-400 mb-1">Short Days</label>
+                                    <input type="number" id="shortDays" value="14" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-slate-400 mb-1">Long Days</label>
+                                    <input type="number" id="longDays" value="30" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-slate-400 mb-1">Implied Volatility (%)</label>
+                                <input type="number" id="iv" value="20" step="0.1" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-sm text-slate-400 mb-1">Strategy</label>
+                                <select id="strategyType" class="w-full px-3 py-2 bg-slate-900/50 border border-slate-600 rounded-lg text-white input-focus focus:outline-none">
+                                    <option value="double_calendar">Double Calendar</option>
+                                    <option value="calendar_call">Calendar Call</option>
+                                    <option value="calendar_put">Calendar Put</option>
+                                </select>
+                            </div>
+                            <button onclick="calculateStrategy()" class="w-full btn-primary text-white font-semibold py-3 rounded-xl">Calculate</button>
+                        </div>
+                    </div>
+                    <!-- Results Panel -->
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                        <h3 class="text-lg font-semibold text-white mb-4">Results</h3>
+                        <div id="results" class="space-y-4">
+                            <p class="text-slate-400 text-center">Click Calculate to see results</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Chart -->
+                <div class="mt-6 bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                    <h3 class="text-lg font-semibold text-white mb-4">Payoff Diagram</h3>
+                    <div style="height: 300px;">
+                        <canvas id="payoffChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Strategies Tab -->
+            <div id="strategiesTab" class="hidden">
+                <h1 class="text-2xl font-bold text-white mb-6">Strategy Guide</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                        <h3 class="text-lg font-semibold text-cyan-400 mb-2">Double Calendar</h3>
+                        <p class="text-slate-400 text-sm mb-4">Primary strategy - 80% win rate. Sell near-term, buy far-term options.</p>
+                        <ul class="text-slate-400 text-sm space-y-1">
+                            <li>• Entry: VIX 15-20</li>
+                            <li>• Strikes: 10% OTM</li>
+                            <li>• Take profit: 20-40%</li>
+                            <li>• Stop loss: 30% mental</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                        <h3 class="text-lg font-semibold text-purple-400 mb-2">Time Spread</h3>
+                        <p class="text-slate-400 text-sm mb-4">Theta Machine - 300%+ potential. Earn theta daily.</p>
+                        <ul class="text-slate-400 text-sm space-y-1">
+                            <li>• Entry: 20-30 delta</li>
+                            <li>• Direction: Any</li>
+                            <li>• Risk $162, Reward $618</li>
+                            <li>• Exit before expiry</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-800/50 rounded-xl p-6 border border-slate-700/50">
+                        <h3 class="text-lg font-semibold text-green-400 mb-2">Double Diagonal</h3>
+                        <p class="text-slate-400 text-sm mb-4">Wide range play. Lower Vega risk than double calendar.</p>
+                        <ul class="text-slate-400 text-sm space-y-1">
+                            <li>• Entry: VIX > 20</li>
+                            <li>• Use when IV high</li>
+                            <li>• Wider profit zone</li>
+                            <li>• Lower Vega exposure</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
