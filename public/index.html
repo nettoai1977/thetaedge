@@ -42,7 +42,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 23, 42, 0.95);
+            background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-top: 1px solid rgba(148, 163, 184, 0.1);
@@ -56,16 +56,28 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 8px 4px;
-            color: #94A3B8;
+            padding: 8px 12px;
+            color: #64748B;
             transition: all 0.2s;
             border-radius: 12px;
             min-width: 64px;
+            position: relative;
         }
         
         .bottom-nav-item.active {
             color: #06B6D4;
-            background: rgba(6, 182, 212, 0.1);
+        }
+        
+        .bottom-nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: #06B6D4;
+            border-radius: 0 0 3px 3px;
         }
         
         .bottom-nav-item svg {
@@ -76,13 +88,35 @@
         
         .bottom-nav-item span {
             font-size: 10px;
-            font-weight: 500;
+            font-weight: 600;
+        }
+        
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+            z-index: 40;
+            transition: transform 0.2s;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
         }
         
         /* Mobile-optimized cards */
         .mobile-card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(148, 163, 184, 0.1);
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.08);
             border-radius: 16px;
             padding: 16px;
             backdrop-filter: blur(10px);
@@ -98,6 +132,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
+            letter-spacing: 0.3px;
         }
         
         .btn-primary-mobile {
@@ -110,12 +145,24 @@
             transform: scale(0.98);
         }
         
+        .btn-success-mobile {
+            background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+        
         /* Mobile input fields */
         .input-mobile {
             height: 52px;
             border-radius: 12px;
             font-size: 16px;
             padding: 0 16px;
+        }
+        
+        /* Tabular numbers for financial data */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum";
         }
         
         /* Swipe indicator */
@@ -135,6 +182,20 @@
         /* Bottom content padding */
         .content-bottom {
             padding-bottom: 100px;
+        }
+        
+        /* Pull to refresh indicator */
+        .pull-refresh {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .pull-refresh.visible {
+            opacity: 1;
         }
         
         /* Fade animations */
@@ -173,6 +234,36 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.7; transform: scale(1.1); }
+        }
+        
+        /* Probability badge */
+        .probability-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .probability-high {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22C55E;
+        }
+        
+        .probability-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #F59E0B;
+        }
+        
+        .probability-low {
+            background: rgba(239, 68, 68, 0.2);
+            color: #EF4444;
+        }
+        
+        /* Touch manipulation for iOS */
+        button, a, input, select {
+            touch-action: manipulation;
         }
     </style>
 </head>
@@ -377,19 +468,26 @@
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div class="mobile-card text-center">
                             <p class="text-xs text-slate-400 mb-1">Net Debit</p>
-                            <p id="resultDebit" class="text-xl font-bold text-white">$0</p>
+                            <p id="resultDebit" class="text-xl font-bold text-white tabular-nums">$0</p>
                         </div>
                         <div class="mobile-card text-center">
                             <p class="text-xs text-slate-400 mb-1">Max Profit</p>
-                            <p id="resultProfit" class="text-xl font-bold text-green-400">$0</p>
+                            <p id="resultProfit" class="text-xl font-bold text-green-400 tabular-nums">$0</p>
                         </div>
                         <div class="mobile-card text-center">
                             <p class="text-xs text-slate-400 mb-1">Max Loss</p>
-                            <p id="resultLoss" class="text-xl font-bold text-red-400">$0</p>
+                            <p id="resultLoss" class="text-xl font-bold text-red-400 tabular-nums">$0</p>
                         </div>
                         <div class="mobile-card text-center">
                             <p class="text-xs text-slate-400 mb-1">Risk/Reward</p>
-                            <p id="resultRR" class="text-xl font-bold text-cyan-400">1:0</p>
+                            <p id="resultRR" class="text-xl font-bold text-cyan-400 tabular-nums">1:0</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Probability Badge -->
+                    <div class="mb-4">
+                        <div id="probabilityBadge" class="probability-badge probability-high">
+                            <span class="mr-1">🎯</span> 80% Win Rate
                         </div>
                     </div>
                     
@@ -591,6 +689,13 @@
                 </button>
             </div>
         </nav>
+        
+        <!-- Floating Action Button (Quick Trade) -->
+        <button onclick="calculateStrategy()" class="fab" aria-label="Calculate Strategy">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+            </svg>
+        </button>
     </div>
 
     <script src="app.js"></script>
