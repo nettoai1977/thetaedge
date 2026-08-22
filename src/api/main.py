@@ -18,6 +18,7 @@ from ..engine.market_calendar import MarketCalendar
 from ..engine.ticker_scanner import TickerScanner
 from ..engine.position_sizer import PositionSizer
 from ..engine.theta_brain import ThetaBrain, MarketInputs
+from ..engine.signal_tracker import SignalTracker
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -289,6 +290,67 @@ class BrainOutputResponse(BaseModel):
     exit_rules: List[str]
     warnings: List[str]
     reasoning: List[str]
+
+
+class SignalLogRequest(BaseModel):
+    symbol: str
+    signal: str
+    signal_strength: str
+    strategy: str
+    confidence: str
+    vix_level: float
+    iv_rank: float
+    price_at_signal: float
+    put_strike: float
+    call_strike: float
+    contracts: int
+    max_risk: float
+    notes: str = ""
+
+
+class SignalUpdateRequest(BaseModel):
+    signal_id: str
+    outcome: str
+    pnl: float
+    pnl_pct: float
+    exit_date: str
+    exit_price: float
+
+
+class SignalRecordResponse(BaseModel):
+    id: str
+    timestamp: str
+    symbol: str
+    signal: str
+    signal_strength: str
+    strategy: str
+    confidence: str
+    vix_level: float
+    iv_rank: float
+    price_at_signal: float
+    put_strike: float
+    call_strike: float
+    contracts: int
+    max_risk: float
+    outcome: Optional[str]
+    pnl: Optional[float]
+    pnl_pct: Optional[float]
+    exit_date: Optional[str]
+    exit_price: Optional[float]
+    notes: str
+
+
+class PerformanceResponse(BaseModel):
+    total_signals: int
+    closed_trades: int
+    win_rate: float
+    avg_pnl: float
+    total_pnl: float
+    profit_factor: float
+    max_win: float
+    max_loss: float
+    avg_win: float
+    avg_loss: float
 
 
 # ============ API Endpoints ============
@@ -709,6 +771,91 @@ async def analyze_trade(request: BrainAnalyzeRequest):
 async def quick_assessment(vix: float = 18, iv_rank: float = 40):
     """Quick brain assessment"""
     return brain.get_quick_assessment(vix, iv_rank)
+
+
+# ============ Signal Tracker Endpoints ============
+
+tracker = SignalTracker()
+
+
+@app.post("/api/signals/log", response_model=SignalRecordResponse)
+async def log_signal(request: SignalLogRequest):
+    """Log a new trading signal"""
+    return tracker.log_signal(
+        symbol=request.symbol,
+        signal=request.signal,
+        signal_strength=request.signal_strength,
+        strategy=request.strategy,
+        confidence=request.confidence,
+        vix_level=request.vix_level,
+        iv_rank=request.iv_rank,
+        price_at_signal=request.price_at_signal,
+        put_strike=request.put_strike,
+        call_strike=request.call_strike,
+        contracts=request.contracts,
+        max_risk=request.max_risk,
+        notes=request.notes
+    )
+
+
+@app.put("/api/signals/update")
+async def update_signal_outcome(request: SignalUpdateRequest):
+    """Update signal with outcome"""
+    success = tracker.update_outcome(
+        signal_id=request.signal_id,
+        outcome=request.outcome,
+        pnl=request.pnl,
+        pnl_pct=request.pnl_pct,
+        exit_date=request.exit_date,
+        exit_price=request.exit_price
+    )
+    return {"success": success}
+
+
+@app.get("/api/signals", response_model=List[SignalRecordResponse])
+async def get_signals(
+    symbol: str = None,
+    signal: str = None,
+    limit: int = 50
+):
+    """Get signals with optional filters"""
+    return tracker.get_signals(symbol=symbol, signal=signal, limit=limit)
+
+
+@app.get("/api/signals/performance", response_model=PerformanceResponse)
+async def get_performance():
+    """Get overall performance metrics"""
+    return tracker.get_performance()
+
+
+@app.get("/api/signals/accuracy")
+async def get_signal_accuracy():
+    """Get signal accuracy by type"""
+    return tracker.get_signal_accuracy()
+
+
+@app.get("/api/signals/strategy-performance")
+async def get_strategy_performance():
+    """Get performance by strategy"""
+    return tracker.get_strategy_performance()
+
+
+@app.get("/api/signals/vix-performance")
+async def get_vix_performance():
+    """Get performance by VIX level"""
+    return tracker.get_vix_performance()
+
+
+@app.get("/api/signals/equity-curve")
+async def get_equity_curve():
+    """Get equity curve data"""
+    return tracker.get_equity_curve()
+
+
+@app.get("/api/signals/daily-summary")
+async def get_daily_summary():
+    """Get daily P&L summary"""
+    return tracker.get_daily_summary()
 
 
 if __name__ == "__main__":

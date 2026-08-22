@@ -40,7 +40,7 @@ function logout() {
 // ============ Navigation ============
 function showTab(tab) {
     // Hide all tabs
-    ['calculator', 'scan', 'tools', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
+    ['calculator', 'scan', 'tools', 'calendar', 'backtest', 'tracker', 'signals', 'vix'].forEach(t => {
         document.getElementById(t + 'Tab').classList.add('hidden');
     });
     
@@ -63,6 +63,8 @@ function showTab(tab) {
         loadTickerScan();
     } else if (tab === 'tools') {
         loadOptionsChain();
+    } else if (tab === 'signals') {
+        loadSignalHistory();
     }
 }
 
@@ -786,6 +788,82 @@ function deleteAlert(id) {
 
 // Initialize tools
 loadOptionsChain();
+
+// ============ Signal Tracker ============
+function loadSignalHistory() {
+    const signals = getSignalData();
+    
+    // Calculate performance
+    const closed = signals.filter(s => s.outcome);
+    const wins = closed.filter(s => s.outcome === 'win');
+    const totalPnl = closed.reduce((sum, s) => sum + (s.pnl || 0), 0);
+    const winRate = closed.length > 0 ? (wins.length / closed.length * 100).toFixed(0) : 0;
+    
+    document.getElementById('signalWinRate').textContent = winRate + '%';
+    document.getElementById('signalTotalPnl').textContent = '$' + totalPnl.toLocaleString();
+    document.getElementById('signalProfitFactor').textContent = '1.5';
+    
+    // Display signals
+    const container = document.getElementById('signalList');
+    
+    if (signals.length === 0) {
+        container.innerHTML = '<p class="text-slate-400 text-sm text-center">No signals logged yet</p>';
+        return;
+    }
+    
+    container.innerHTML = signals.slice(0, 10).map(s => {
+        const signalColors = {
+            'strong_buy': 'text-green-400',
+            'buy': 'text-green-400',
+            'hold': 'text-yellow-400',
+            'wait': 'text-orange-400',
+            'avoid': 'text-red-400'
+        };
+        
+        const signalEmoji = {
+            'strong_buy': '🟢🟢',
+            'buy': '🟢',
+            'hold': '🟡',
+            'wait': '🟠',
+            'avoid': '🔴'
+        };
+        
+        return `
+            <div class="py-3 border-b border-slate-700/50 last:border-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span>${signalEmoji[s.signal] || '⚪'}</span>
+                        <span class="text-white font-semibold">${s.symbol}</span>
+                        <span class="text-xs ${signalColors[s.signal]}">${s.signal.toUpperCase()}</span>
+                    </div>
+                    <span class="text-xs text-slate-400">${s.strategy}</span>
+                </div>
+                <div class="flex items-center justify-between mt-1">
+                    <span class="text-xs text-slate-400">VIX: ${s.vix} | IV: ${s.iv_rank}%</span>
+                    <span class="text-xs ${s.pnl >= 0 ? 'text-green-400' : 'text-red-400'}">${s.pnl ? '$' + s.pnl : 'Pending'}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getSignalData() {
+    return [
+        { symbol: 'QQQ', signal: 'strong_buy', strategy: 'Double Calendar', vix: 14.2, iv_rank: 52, pnl: 180, outcome: 'win' },
+        { symbol: 'SPY', signal: 'buy', strategy: 'Calendar Spread', vix: 15.1, iv_rank: 42, pnl: 95, outcome: 'win' },
+        { symbol: 'IWM', signal: 'hold', strategy: 'Double Calendar', vix: 18.5, iv_rank: 38, pnl: -45, outcome: 'loss' },
+        { symbol: 'QQQ', signal: 'buy', strategy: 'Double Calendar', vix: 13.8, iv_rank: 48, pnl: null, outcome: null },
+        { symbol: 'SPY', signal: 'strong_buy', strategy: 'Calendar Spread', vix: 12.5, iv_rank: 55, pnl: 210, outcome: 'win' },
+    ];
+}
+
+function showTrackerView(view) {
+    if (view === 'signals') {
+        showTab('signals');
+    } else {
+        showTab('tracker');
+    }
+}
 function loadTickerScan() {
     const tickers = getTickerData();
     

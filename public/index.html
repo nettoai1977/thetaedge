@@ -953,6 +953,40 @@
                 </div>
             </div>
             
+            <!-- Signal Tracker Tab -->
+            <div id="signalsTab" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">Signal History</h1>
+                </div>
+                
+                <!-- Performance Summary -->
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">Performance Metrics</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-slate-900/50 rounded-lg p-2 text-center">
+                            <p class="text-xs text-slate-400">Win Rate</p>
+                            <p id="signalWinRate" class="text-lg font-bold text-green-400">0%</p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-2 text-center">
+                            <p class="text-xs text-slate-400">Total P&L</p>
+                            <p id="signalTotalPnl" class="text-lg font-bold text-cyan-400">$0</p>
+                        </div>
+                        <div class="bg-slate-900/50 rounded-lg p-2 text-center">
+                            <p class="text-xs text-slate-400">Profit Factor</p>
+                            <p id="signalProfitFactor" class="text-lg font-bold text-cyan-400">0.0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Signal List -->
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">Recent Signals</h3>
+                    <div id="signalList" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">No signals logged yet</p>
+                    </div>
+                </div>
+            </div>
+            
             <!-- VIX Tab -->
             <div id="vixTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">VIX Monitor</h1>
@@ -1045,6 +1079,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span>Trades</span>
+                </button>
+                <button onclick="showTab('signals')" id="nav-signals" class="bottom-nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <span>Signals</span>
                 </button>
                 <button onclick="showTab('vix')" id="nav-vix" class="bottom-nav-item">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
