@@ -16,6 +16,7 @@ from ..engine.tracker import TradeTracker
 from ..engine.vix_monitor import VIXMonitor
 from ..engine.market_calendar import MarketCalendar
 from ..engine.ticker_scanner import TickerScanner
+from ..engine.position_sizer import PositionSizer
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -239,6 +240,23 @@ class TickerDetailsResponse(BaseModel):
     ticker: TickerDataResponse
     strategy_recommendation: Dict
     entry_criteria: Dict
+
+
+class PositionSizeRequest(BaseModel):
+    net_debit: float
+    max_loss_pct: float = 100
+    risk_pct: float = 2.0
+    account_size: float = 10000
+
+
+class PositionSizeResponse(BaseModel):
+    account_size: float
+    risk_per_trade_pct: float
+    max_loss_per_trade: float
+    contracts: int
+    total_risk: float
+    risk_remaining: float
+    recommendation: str
 
 
 # ============ API Endpoints ============
@@ -611,6 +629,22 @@ async def get_best_tickers(limit: int = 5):
 async def get_ticker_details(symbol: str):
     """Get detailed ticker analysis"""
     return scanner.get_ticker_details(symbol.upper())
+
+
+# ============ Position Sizing Endpoints ============
+
+sizer = PositionSizer()
+
+
+@app.post("/api/position/calculate", response_model=PositionSizeResponse)
+async def calculate_position_size(request: PositionSizeRequest):
+    """Calculate position size"""
+    sizer.account_size = request.account_size
+    return sizer.calculate(
+        net_debit=request.net_debit,
+        max_loss_pct=request.max_loss_pct,
+        risk_pct=request.risk_pct
+    )
 
 
 if __name__ == "__main__":

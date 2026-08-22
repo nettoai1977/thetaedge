@@ -506,6 +506,39 @@
                         <h3 class="text-sm font-semibold text-white mb-3">Position Legs</h3>
                         <div id="legsList" class="space-y-2"></div>
                     </div>
+                    
+                    <!-- Position Sizing -->
+                    <div class="mobile-card mt-4">
+                        <h3 class="text-sm font-semibold text-white mb-3">Position Size Calculator</h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Account Size</label>
+                                    <input type="number" id="accountSize" value="10000" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-slate-400 mb-1">Risk %</label>
+                                    <input type="number" id="riskPct" value="2" step="0.5" class="w-full h-10 bg-slate-900/50 border border-slate-600 rounded-lg text-white px-3 text-sm input-mobile focus:outline-none focus:border-cyan-500">
+                                </div>
+                            </div>
+                            <button onclick="calculatePosition()" class="w-full h-12 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-xl transition-colors">
+                                Calculate Position Size
+                            </button>
+                            <div id="positionResult" class="hidden">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div class="bg-slate-900/50 rounded-lg p-2 text-center">
+                                        <p class="text-xs text-slate-400">Contracts</p>
+                                        <p id="posContracts" class="text-lg font-bold text-cyan-400">0</p>
+                                    </div>
+                                    <div class="bg-slate-900/50 rounded-lg p-2 text-center">
+                                        <p class="text-xs text-slate-400">Max Risk</p>
+                                        <p id="posRisk" class="text-lg font-bold text-red-400">$0</p>
+                                    </div>
+                                </div>
+                                <p id="posRecommendation" class="text-xs text-slate-400 mt-2 text-center"></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             

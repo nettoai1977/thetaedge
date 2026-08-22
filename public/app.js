@@ -519,6 +519,46 @@ function updateVIXMonitor() {
     `;
 }
 
+// ============ Position Sizing ============
+function calculatePosition() {
+    const accountSize = +document.getElementById('accountSize').value;
+    const riskPct = +document.getElementById('riskPct').value;
+    
+    // Get current net debit from results
+    const debitText = document.getElementById('resultDebit').textContent;
+    const netDebit = parseFloat(debitText.replace('$', '')) || 0;
+    
+    if (netDebit <= 0) {
+        alert('Please calculate a strategy first');
+        return;
+    }
+    
+    // Calculate position size
+    const maxLoss = netDebit * 100; // Options multiplier
+    const maxDollarRisk = accountSize * (riskPct / 100);
+    const contracts = Math.floor(maxDollarRisk / maxLoss);
+    const totalRisk = contracts * maxLoss;
+    
+    // Display results
+    document.getElementById('posContracts').textContent = Math.min(contracts, 10);
+    document.getElementById('posRisk').textContent = '$' + totalRisk.toLocaleString();
+    
+    let recommendation = '';
+    if (contracts === 0) {
+        recommendation = 'Position too large for account size';
+    } else if (contracts >= 5) {
+        recommendation = 'Large position - consider splitting entries';
+    } else {
+        recommendation = 'Position size looks good ✓';
+    }
+    document.getElementById('posRecommendation').textContent = recommendation;
+    
+    document.getElementById('positionResult').classList.remove('hidden');
+    
+    // Haptic feedback
+    if (navigator.vibrate) navigator.vibrate(10);
+}
+
 // ============ Ticker Scanner ============
 function loadTickerScan() {
     const tickers = getTickerData();
