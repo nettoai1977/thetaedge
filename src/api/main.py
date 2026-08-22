@@ -15,6 +15,7 @@ from ..engine.backtest import BacktestEngine
 from ..engine.tracker import TradeTracker
 from ..engine.vix_monitor import VIXMonitor
 from ..engine.market_calendar import MarketCalendar
+from ..engine.ticker_scanner import TickerScanner
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -215,6 +216,29 @@ class CalendarEventResponse(BaseModel):
     time: Optional[str]
     day_name: Optional[str]
     days_until: Optional[int]
+
+
+class TickerDataResponse(BaseModel):
+    symbol: str
+    name: str
+    price: float
+    change_pct: float
+    volume: int
+    avg_volume: int
+    iv_rank: float
+    iv_percentile: float
+    beta: float
+    sector: str
+    earnings_date: Optional[str]
+    has_earnings_soon: bool
+    liquidity_score: float
+    recommendation: str
+
+
+class TickerDetailsResponse(BaseModel):
+    ticker: TickerDataResponse
+    strategy_recommendation: Dict
+    entry_criteria: Dict
 
 
 # ============ API Endpoints ============
@@ -564,6 +588,29 @@ async def get_upcoming_events(days: int = 7):
 async def get_market_hours_nz():
     """Get market hours in NZ time"""
     return calendar.get_market_hours_nz()
+
+
+# ============ Ticker Scanner Endpoints ============
+
+scanner = TickerScanner()
+
+
+@app.get("/api/tickers/scan", response_model=List[TickerDataResponse])
+async def scan_tickers():
+    """Scan all popular tickers"""
+    return scanner.scan_all()
+
+
+@app.get("/api/tickers/best", response_model=List[TickerDataResponse])
+async def get_best_tickers(limit: int = 5):
+    """Get best tickers for trading"""
+    return scanner.get_best_tickers(limit)
+
+
+@app.get("/api/tickers/{symbol}", response_model=TickerDetailsResponse)
+async def get_ticker_details(symbol: str):
+    """Get detailed ticker analysis"""
+    return scanner.get_ticker_details(symbol.upper())
 
 
 if __name__ == "__main__":

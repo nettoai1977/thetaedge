@@ -40,7 +40,7 @@ function logout() {
 // ============ Navigation ============
 function showTab(tab) {
     // Hide all tabs
-    ['calculator', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
+    ['calculator', 'scan', 'calendar', 'backtest', 'tracker', 'vix'].forEach(t => {
         document.getElementById(t + 'Tab').classList.add('hidden');
     });
     
@@ -56,9 +56,11 @@ function showTab(tab) {
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
     
-    // Load calendar data if needed
+    // Load data if needed
     if (tab === 'calendar') {
         loadCalendarData();
+    } else if (tab === 'scan') {
+        loadTickerScan();
     }
 }
 
@@ -517,7 +519,78 @@ function updateVIXMonitor() {
     `;
 }
 
-// ============ Market Calendar ============
+// ============ Ticker Scanner ============
+function loadTickerScan() {
+    const tickers = getTickerData();
+    
+    // Best tickers (recommended)
+    const bestDiv = document.getElementById('bestTickers');
+    const bestTickers = tickers.filter(t => t.recommendation === 'buy').slice(0, 5);
+    
+    if (bestTickers.length === 0) {
+        bestDiv.innerHTML = '<p class="text-slate-400 text-sm text-center">No tickers meet criteria</p>';
+    } else {
+        bestDiv.innerHTML = bestTickers.map(t => `
+            <div class="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                        <span class="text-cyan-400 font-bold text-sm">${t.symbol}</span>
+                    </div>
+                    <div>
+                        <p class="text-white font-medium">${t.name}</p>
+                        <p class="text-xs text-slate-400">${t.sector}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-white font-semibold">$${t.price}</p>
+                    <p class="text-xs ${t.change_pct >= 0 ? 'text-green-400' : 'text-red-400'}">
+                        ${t.change_pct >= 0 ? '+' : ''}${t.change_pct}%
+                    </p>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    // All tickers
+    const allDiv = document.getElementById('allTickers');
+    allDiv.innerHTML = tickers.map(t => `
+        <div class="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg ${t.recommendation === 'buy' ? 'bg-green-500/20' : t.recommendation === 'avoid' ? 'bg-red-500/20' : 'bg-yellow-500/20'} flex items-center justify-center">
+                    <span class="${t.recommendation === 'buy' ? 'text-green-400' : t.recommendation === 'avoid' ? 'text-red-400' : 'text-yellow-400'} font-bold text-sm">${t.symbol}</span>
+                </div>
+                <div>
+                    <p class="text-white font-medium">${t.name}</p>
+                    <p class="text-xs text-slate-400">IV: ${t.iv_rank}% | Vol: ${(t.volume/1000000).toFixed(1)}M</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-white font-semibold">$${t.price}</p>
+                <span class="text-xs px-2 py-1 rounded ${t.recommendation === 'buy' ? 'bg-green-500/20 text-green-400' : t.recommendation === 'avoid' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}">
+                    ${t.recommendation.toUpperCase()}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function getTickerData() {
+    // Simulated ticker data
+    const tickers = [
+        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 482.50, change_pct: 0.85, volume: 35000000, iv_rank: 45, sector: 'Technology', recommendation: 'buy' },
+        { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 551.20, change_pct: 0.42, volume: 55000000, iv_rank: 38, sector: 'Broad Market', recommendation: 'buy' },
+        { symbol: 'IWM', name: 'iShares Russell 2000', price: 218.75, change_pct: -0.32, volume: 25000000, iv_rank: 52, sector: 'Small Cap', recommendation: 'buy' },
+        { symbol: 'AAPL', name: 'Apple Inc', price: 195.80, change_pct: 1.25, volume: 45000000, iv_rank: 35, sector: 'Technology', recommendation: 'hold' },
+        { symbol: 'MSFT', name: 'Microsoft Corp', price: 418.90, change_pct: 0.68, volume: 22000000, iv_rank: 32, sector: 'Technology', recommendation: 'hold' },
+        { symbol: 'NVDA', name: 'NVIDIA Corp', price: 122.40, change_pct: 2.15, volume: 65000000, iv_rank: 58, sector: 'Technology', recommendation: 'buy' },
+        { symbol: 'TSLA', name: 'Tesla Inc', price: 248.50, change_pct: -1.85, volume: 75000000, iv_rank: 65, sector: 'Consumer', recommendation: 'avoid' },
+        { symbol: 'GOOGL', name: 'Alphabet Inc', price: 176.20, change_pct: 0.92, volume: 28000000, iv_rank: 40, sector: 'Technology', recommendation: 'buy' },
+        { symbol: 'AMD', name: 'AMD Inc', price: 158.30, change_pct: 1.45, volume: 42000000, iv_rank: 55, sector: 'Technology', recommendation: 'buy' },
+        { symbol: 'META', name: 'Meta Platforms', price: 502.10, change_pct: 0.78, volume: 18000000, iv_rank: 42, sector: 'Technology', recommendation: 'hold' },
+    ];
+    
+    return tickers;
+}
 function loadCalendarData() {
     // Get current time
     const now = new Date();

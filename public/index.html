@@ -509,6 +509,34 @@
                 </div>
             </div>
             
+            <!-- Scan Tab -->
+            <div id="scanTab" class="hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">Ticker Scanner</h1>
+                    <button onclick="loadTickerScan()" class="touch-target text-cyan-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Best Tickers -->
+                <div class="mobile-card mb-4">
+                    <h3 class="text-sm font-semibold text-white mb-3">🎯 Best Tickers to Trade</h3>
+                    <div id="bestTickers" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">Tap refresh to scan</p>
+                    </div>
+                </div>
+                
+                <!-- All Tickers -->
+                <div class="mobile-card">
+                    <h3 class="text-sm font-semibold text-white mb-3">All Tickers</h3>
+                    <div id="allTickers" class="space-y-2">
+                        <p class="text-slate-400 text-sm text-center">Tap refresh to scan</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Calendar Tab -->
             <div id="calendarTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">US Market Calendar</h1>
@@ -755,17 +783,17 @@
                 </svg>
                 <span>Calc</span>
                 </button>
+                <button onclick="showTab('scan')" id="nav-scan" class="bottom-nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span>Scan</span>
+                </button>
                 <button onclick="showTab('calendar')" id="nav-calendar" class="bottom-nav-item">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
                 <span>Calendar</span>
-                </button>
-                <button onclick="showTab('backtest')" id="nav-backtest" class="bottom-nav-item">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                <span>Backtest</span>
                 </button>
                 <button onclick="showTab('tracker')" id="nav-tracker" class="bottom-nav-item">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
