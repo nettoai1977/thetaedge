@@ -6,11 +6,12 @@ Options Trading Toolkit
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any
 import numpy as np
 
 from ..engine.black_scholes import black_scholes, calculate_greeks, implied_volatility
 from ..engine.strategies import StrategyTemplates
+from ..engine.backtest import BacktestEngine
 
 app = FastAPI(
     title="ThetaEdge API",
@@ -43,7 +44,7 @@ class OptionPricingRequest(BaseModel):
 class OptionPricingResponse(BaseModel):
     price: float
     greeks: Dict[str, float]
-    inputs: Dict[str, float]
+    inputs: Dict[str, Any]
 
 
 class CalendarSpreadRequest(BaseModel):
@@ -78,6 +79,41 @@ class StrategyResponse(BaseModel):
     payoff_values: List[float]
     description: str
     entry_criteria: Dict
+
+
+class BacktestRequest(BaseModel):
+    ticker: str = "QQQ"
+    start_date: str = "2024-01-01"
+    end_date: str = "2024-12-31"
+    initial_capital: float = 100000
+    strategy: str = "double_calendar"
+    put_strike_pct: float = 0.90
+    call_strike_pct: float = 1.10
+    short_days: int = 14
+    long_days: int = 30
+    iv: float = 0.20
+    take_profit_pct: float = 0.30
+    stop_loss_pct: float = 0.30
+
+
+class BacktestResponse(BaseModel):
+    strategy: str
+    ticker: str
+    start_date: str
+    end_date: str
+    total_trades: int
+    winning_trades: int
+    losing_trades: int
+    win_rate: float
+    total_pnl: float
+    avg_pnl: float
+    avg_win: float
+    avg_loss: float
+    max_drawdown: float
+    profit_factor: float
+    sharpe_ratio: float
+    equity_curve: List[float]
+    trades_count: int
 
 
 # ============ API Endpoints ============
@@ -231,6 +267,53 @@ async def create_double_diagonal(
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "ThetaEdge API"}
+
+
+@app.post("/api/backtest", response_model=BacktestResponse)
+async def run_backtest(request: BacktestRequest):
+    """Run backtest on a strategy"""
+    try:
+        engine = BacktestEngine(
+            ticker=request.ticker,
+            start_date=request.start_date,
+            end_date=request.end_date,
+            initial_capital=request.initial_capital
+        )
+        
+        if request.strategy == "double_calendar":
+            result = engine.run_double_calendar(
+                put_strike_pct=request.put_strike_pct,
+                call_strike_pct=request.call_strike_pct,
+                short_days=request.short_days,
+                long_days=request.long_days,
+                iv=request.iv,
+                take_profit_pct=request.take_profit_pct,
+                stop_loss_pct=request.stop_loss_pct
+            )
+        else:
+            raise HTTPException(status_code=400, detail=f"Strategy {request.strategy} not implemented")
+        
+        return BacktestResponse(
+            strategy=result.strategy,
+            ticker=result.ticker,
+            start_date=result.start_date,
+            end_date=result.end_date,
+            total_trades=result.total_trades,
+            winning_trades=result.winning_trades,
+            losing_trades=result.losing_trades,
+            win_rate=result.win_rate,
+            total_pnl=result.total_pnl,
+            avg_pnl=result.avg_pnl,
+            avg_win=result.avg_win,
+            avg_loss=result.avg_loss,
+            max_drawdown=result.max_drawdown,
+            profit_factor=result.profit_factor,
+            sharpe_ratio=result.sharpe_ratio,
+            equity_curve=result.equity_curve,
+            trades_count=len(result.trades)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -252,3 +252,188 @@ function updateChart(prices, payoffs, currentPrice) {
         }
     });
 }
+
+// Backtesting functions
+let equityChart = null;
+
+function runBacktest() {
+    const ticker = document.getElementById('btTicker').value;
+    const capital = +document.getElementById('btCapital').value;
+    const startDate = document.getElementById('btStart').value;
+    const endDate = document.getElementById('btEnd').value;
+    const iv = +document.getElementById('btIV').value / 100;
+    const tp = +document.getElementById('btTP').value / 100;
+    
+    // Generate synthetic backtest data
+    const trades = generateBacktestTrades(ticker, startDate, endDate, capital, iv, tp);
+    const stats = calculateBacktestStats(trades, capital);
+    
+    // Display results
+    const resultsDiv = document.getElementById('btResults');
+    resultsDiv.innerHTML = `
+        <div class="grid grid-cols-2 gap-4 mb-4">
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Total Trades</p>
+                <p class="text-white font-semibold">${stats.totalTrades}</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Win Rate</p>
+                <p class="text-green-400 font-semibold">${stats.winRate}%</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Total P&L</p>
+                <p class="${stats.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'} font-semibold">$${stats.totalPnl.toLocaleString()}</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Profit Factor</p>
+                <p class="text-cyan-400 font-semibold">${stats.profitFactor}</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Avg Win</p>
+                <p class="text-green-400 font-semibold">$${stats.avgWin.toLocaleString()}</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Avg Loss</p>
+                <p class="text-red-400 font-semibold">$${stats.avgLoss.toLocaleString()}</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Max Drawdown</p>
+                <p class="text-yellow-400 font-semibold">${stats.maxDrawdown}%</p>
+            </div>
+            <div class="bg-slate-900/50 rounded-lg p-3">
+                <p class="text-slate-400 text-xs">Sharpe Ratio</p>
+                <p class="text-cyan-400 font-semibold">${stats.sharpeRatio}</p>
+            </div>
+        </div>
+    `;
+    
+    // Update equity curve chart
+    updateEquityChart(stats.equityCurve);
+}
+
+function generateBacktestTrades(ticker, startDate, endDate, capital, iv, takeProfit) {
+    const trades = [];
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const numWeeks = Math.floor((end - start) / (7 * 24 * 60 * 60 * 1000));
+    
+    let currentPrice = 480; // Starting price for QQQ
+    
+    for (let i = 0; i < numWeeks; i++) {
+        const entryDate = new Date(start.getTime() + i * 7 * 24 * 60 * 60 * 1000);
+        
+        // Random price movement
+        const priceChange = (Math.random() - 0.5) * 0.1;
+        currentPrice *= (1 + priceChange);
+        
+        // Random trade outcome
+        const isWin = Math.random() < 0.75; // 75% win rate
+        const pnlPct = isWin ? 
+            Math.random() * takeProfit * 100 : 
+            -(Math.random() * 30 + 5);
+        
+        const tradeAmount = capital * 0.02; // 2% risk per trade
+        const pnl = tradeAmount * (pnlPct / 100);
+        
+        trades.push({
+            date: entryDate.toISOString().split('T')[0],
+            price: currentPrice,
+            pnl: pnl,
+            pnlPct: pnlPct,
+            isWin: isWin
+        });
+    }
+    
+    return trades;
+}
+
+function calculateBacktestStats(trades, initialCapital) {
+    let equity = initialCapital;
+    let peak = initialCapital;
+    let maxDrawdown = 0;
+    const equityCurve = [initialCapital];
+    
+    const wins = trades.filter(t => t.isWin);
+    const losses = trades.filter(t => !t.isWin);
+    
+    let totalPnl = 0;
+    trades.forEach(t => {
+        equity += t.pnl;
+        totalPnl += t.pnl;
+        equityCurve.push(equity);
+        
+        if (equity > peak) peak = equity;
+        const dd = ((peak - equity) / peak) * 100;
+        if (dd > maxDrawdown) maxDrawdown = dd;
+    });
+    
+    const avgWin = wins.length > 0 ? wins.reduce((a, b) => a + b.pnl, 0) / wins.length : 0;
+    const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((a, b) => a + b.pnl, 0) / losses.length) : 0;
+    const profitFactor = avgLoss > 0 ? (avgWin * wins.length) / (avgLoss * losses.length) : 999;
+    
+    // Sharpe ratio approximation
+    const returns = trades.map(t => t.pnlPct / 100);
+    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
+    const stdReturn = Math.sqrt(returns.reduce((a, b) => a + Math.pow(b - avgReturn, 2), 0) / returns.length);
+    const sharpeRatio = stdReturn > 0 ? (avgReturn / stdReturn) * Math.sqrt(52) : 0;
+    
+    return {
+        totalTrades: trades.length,
+        winRate: ((wins.length / trades.length) * 100).toFixed(1),
+        totalPnl: Math.round(totalPnl),
+        avgWin: Math.round(avgWin),
+        avgLoss: Math.round(avgLoss),
+        maxDrawdown: maxDrawdown.toFixed(1),
+        profitFactor: profitFactor.toFixed(2),
+        sharpeRatio: sharpeRatio.toFixed(2),
+        equityCurve: equityCurve
+    };
+}
+
+function updateEquityChart(equityCurve) {
+    const ctx = document.getElementById('equityChart').getContext('2d');
+    if (equityChart) equityChart.destroy();
+    
+    const labels = equityCurve.map((_, i) => `Trade ${i}`);
+    
+    equityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Equity',
+                data: equityCurve,
+                borderColor: '#06B6D4',
+                backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                fill: true,
+                pointRadius: 0,
+                borderWidth: 2,
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (item) => `Equity: $${item.raw.toLocaleString()}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Trades', color: '#94A3B8' },
+                    ticks: { color: '#94A3B8', maxTicksLimit: 10 },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                },
+                y: {
+                    title: { display: true, text: 'Equity ($)', color: '#94A3B8' },
+                    ticks: { color: '#94A3B8' },
+                    grid: { color: 'rgba(148, 163, 184, 0.1)' }
+                }
+            }
+        }
+    });
+}
