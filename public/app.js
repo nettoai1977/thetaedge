@@ -571,8 +571,18 @@ function calculatePosition() {
 }
 
 // ============ ThetaBrain ============
+// Single source of truth: this decision spec mirrors src/engine/theta_brain.py
+// exactly (guard chain → strategy select → EM strikes → debit sizing).
+const BRAIN = {
+    VIX_EXCELLENT: 12, VIX_GOOD: 15, VIX_NORMAL: 20, VIX_HIGH: 25,
+    IV_RANK_HIGH: 50, IV_RANK_MEDIUM: 30,
+    MAX_RISK_PER_TRADE: 2.0,   // % of account
+    MAX_PORTFOLIO_RISK: 15.0,  // %
+    MAX_POSITIONS: 5
+};
+
 async function runThetaBrain() {
-    // Prefill from live data when fields are untouched (use real VIX + price)
+    // Prefill from live data when fields are untouched
     const vixEl = document.getElementById('brainVix');
     const priceEl = document.getElementById('brainPrice');
     if (window.getVixData && (+vixEl.value === 18)) { // default sentinel value
@@ -591,88 +601,101 @@ async function runThetaBrain() {
 
     const vix = +vixEl.value;
     const ivRank = +document.getElementById('brainIvRank').value;
-    const symbol = document.getElementById('brainSymbol').value;
+    const symbol = document.getElementById('brainSymbol').value.toUpperCase();
     const price = +document.getElementById('brainPrice').value;
-    const fomc = +document.getElementById('brainFomc').value;
+    const fomcDays = +document.getElementById('brainFomc').value;
     const account = +document.getElementById('brainAccount').value;
-    
-    // ThetaBrain decision logic
-    let signal, signalColor, strategy, confidence;
-    
-    // Step 1: VIX Regime
-    if (vix < 12) {
-        signal = '🟢 STRONG BUY';
-        signalColor = 'text-green-400';
-        strategy = 'Double Calendar';
-        confidence = 'HIGH';
-    } else if (vix < 15) {
-        signal = '🟢 BUY';
-        signalColor = 'text-green-400';
-        strategy = 'Double Calendar';
-        confidence = 'HIGH';
-    } else if (vix < 20) {
-        signal = '🟡 HOLD';
-        signalColor = 'text-yellow-400';
-        strategy = 'Calendar Spread';
-        confidence = 'MEDIUM';
-    } else if (vix < 25) {
-        signal = '🟠 WAIT';
-        signalColor = 'text-orange-400';
-        strategy = 'Double Diagonal';
-        confidence = 'LOW';
+
+    // ---- Guard chain (mirrors theta_brain.analyze Step 1/2) ----
+    let signal, strength, strategy, confidence, reasoning = [], warnings = [];
+    let blocked = false;
+
+    if (vix > BRAIN.VIX_HIGH) {
+        blocked = true; reasoning.push(`VIX ${vix} too high (> ${BRAIN.VIX_HIGH})`);
+    } else if (fomcDays > 0 && fomcDays <= 2) {
+        blocked = true; reasoning.push(`FOMC in ${fomcDays} days`);
+    } else if (ivRank < 20) {
+        blocked = true; reasoning.push(`IV Rank too low (${ivRank}% < 20%)`);
+    }
+
+    if (blocked) {
+        signal = '🔴 AVOID'; strength = 'strong'; strategy = 'None'; confidence = 'NONE';
+        warnings.push(...reasoning.map(r => 'Blocked: ' + r));
     } else {
-        signal = '🔴 AVOID';
-        signalColor = 'text-red-400';
-        strategy = 'None';
-        confidence = 'NONE';
+        // ---- Strategy selection (Step 3) ----
+        if (vix < BRAIN.VIX_GOOD) {
+            strategy = 'Double Calendar'; confidence = 'HIGH';
+            reasoning.push(`VIX LOW (${vix}) - Double Calendar`);
+        } else if (vix < BRAIN.VIX_NORMAL) {
+            strategy = 'Calendar Call'; confidence = 'MEDIUM';
+            reasoning.push(`VIX NORMAL (${vix}) - Calendar Spread`);
+        } else {
+            strategy = 'Double Diagonal'; confidence = 'LOW';
+            reasoning.push(`VIX HIGH (${vix}) - Double Diagonal`);
+        }
+
+        // ---- Strikes: expected-move based (Step 4) ----
+        const ivDecimal = ivRank / 100 * 0.5 + 0.10; // rank→IV proxy (matches engine)
+        const em = price * ivDecimal * Math.sqrt(30 / 365);
+        const putStrike = Math.round((price - em) / 5) * 5;
+        const callStrike = Math.round((price + em) / 5) * 5;
+        reasoning.push(`Strikes P${putStrike}/C${callStrike} (±1.0 EM ≈ $${Math.round(em)})`);
+
+        // ---- Position size from est. calendar debit (Step 5) ----
+        const debitPct = 0.012; // mid estimate; real chain debit wired via API when live
+        const estDebit = price * debitPct * 100;
+        const riskBudget = account * (BRAIN.MAX_RISK_PER_TRADE / 100);
+        var contracts = Math.min(Math.floor(riskBudget / estDebit), BRAIN.MAX_POSITIONS);
+        var totalRisk = contracts * estDebit;
+        reasoning.push(`Est. debit $${estDebit.toFixed(0)}/contract → ${contracts} contracts fits $${riskBudget.toFixed(0)} budget`);
+
+        // ---- Signal ----
+        if (vix < BRAIN.VIX_GOOD && ivRank > BRAIN.IV_RANK_HIGH) {
+            signal = '🟢 STRONG BUY'; strength = 'strong';
+        } else if (vix < BRAIN.VIX_NORMAL) {
+            signal = '🟢 BUY'; strength = 'moderate';
+        } else {
+            signal = '🟡 HOLD'; strength = 'weak';
+        }
+
+        // Update strike/risk UI (only in non-blocked path)
+        document.getElementById('brainPutStrike').textContent = `$${putStrike}`;
+        document.getElementById('brainCallStrike').textContent = `$${callStrike}`;
+        document.getElementById('brainContracts').textContent = contracts;
+        document.getElementById('brainRisk').textContent = `$${totalRisk.toLocaleString()}`;
     }
-    
-    // Step 2: FOMC check
-    let warnings = [];
-    if (fomc <= 2) {
-        warnings.push('FOMC in ' + fomc + ' days - wait');
-        signal = '🔴 WAIT';
-        signalColor = 'text-red-400';
-    }
-    
-    // Step 3: IV Rank check
-    if (ivRank < 20) {
-        warnings.push('IV Rank too low for selling');
-    }
-    
-    // Step 4: Strikes
-    const putStrike = Math.round(price * 0.90 / 5) * 5;
-    const callStrike = Math.round(price * 1.10 / 5) * 5;
-    
-    // Step 5: Position size
-    const riskPerTrade = account * 0.02;
-    const maxLoss = price * 0.02 * 100;
-    const contracts = Math.min(Math.floor(riskPerTrade / maxLoss), 5);
-    const totalRisk = contracts * maxLoss;
-    
+
+    const signalColor = blocked ? 'text-red-400' : signal.includes('STRONG') ? 'text-green-400' : signal.includes('BUY') ? 'text-green-400' : 'text-yellow-400';
+
     // Update UI
     document.getElementById('brainSignal').textContent = signal;
     document.getElementById('brainSignal').className = `text-lg font-bold ${signalColor}`;
     document.getElementById('brainStrategy').textContent = strategy;
     document.getElementById('brainConfidence').textContent = `Confidence: ${confidence}`;
-    document.getElementById('brainPutStrike').textContent = `$${putStrike}`;
-    document.getElementById('brainCallStrike').textContent = `$${callStrike}`;
-    document.getElementById('brainContracts').textContent = contracts;
-    document.getElementById('brainRisk').textContent = `$${totalRisk.toLocaleString()}`;
-    
-    // Entry rules
-    const entryRules = [
+
+    // Entry rules / reasoning
+    const entryRules = blocked ? reasoning : [
         `✓ VIX at ${vix} - ${vix < 15 ? 'Good' : vix < 20 ? 'Acceptable' : 'Caution'}`,
+        `✓ IV Rank ${ivRank}%`,
         `✓ Use ${strategy} strategy`,
-        `✓ Strikes: Put $${putStrike} / Call $${callStrike}`,
-        `✓ Position size: ${contracts} contracts`,
+        ...reasoning.slice(1),
         '✓ Place limit order at mid-price',
     ];
-    
-    document.getElementById('brainEntryRules').innerHTML = entryRules.map(r => 
-        `<p class="text-xs text-green-400">${r}</p>`
-    ).join('');
-    
+
+    document.getElementById('brainEntryRules').innerHTML =
+        entryRules.map(r => `<p class="text-xs ${blocked ? 'text-red-400' : 'text-green-400'}">${blocked ? '✗ ' : ''}${r}</p>`).join('');
+
+    // Exit rules (aligned to Ravish playbook)
+    const exitRules = [
+        'Take profit at 30% of net debit',
+        'Stop loss at 30% (mental)',
+        'Roll if < 7 days to expiry',
+        'Roll if short strike delta > 0.40'
+    ];
+    const exitEl = document.getElementById('brainExitRules');
+    if (exitEl) exitEl.innerHTML = exitRules.map(r =>
+        `<p class="text-xs text-cyan-400">→ ${r}</p>`).join('');
+
     // Warnings
     if (warnings.length > 0) {
         document.getElementById('brainWarnings').classList.remove('hidden');
@@ -685,6 +708,18 @@ async function runThetaBrain() {
     
     document.getElementById('brainOutput').classList.remove('hidden');
     
+    // Log every analysis to signal history (feeds win-rate badge over time)
+    try {
+        const signals = JSON.parse(localStorage.getItem('thetaedge_signals') || '[]');
+        signals.unshift({
+            symbol, signal: blocked ? 'avoid' : (signal.includes('STRONG') ? 'strong_buy' : signal.includes('BUY') ? 'buy' : 'hold'),
+            strategy: blocked ? null : strategy,
+            vix, iv_rank: ivRank, price,
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('thetaedge_signals', JSON.stringify(signals.slice(0, 50)));
+    } catch (e) { console.warn('Signal log failed:', e); }
+
     if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
 }
 

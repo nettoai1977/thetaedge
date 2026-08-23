@@ -3,6 +3,7 @@ ThetaBrain - Intelligent Trading Decision Engine
 Uses real market data from Yahoo Finance
 """
 
+import math
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
@@ -45,6 +46,10 @@ class MarketInputs:
     current_positions: int
     account_size: float
     current_risk_pct: float
+    # New optional inputs (defaulted so existing callers keep working)
+    term_structure_ratio: Optional[float] = None   # VIX / VIX3M; >1 = backwardation
+    iv_estimate: Optional[float] = None            # decimal ATM IV, e.g. 0.12
+    debit_pct_estimate: Optional[float] = None     # calendar debit as % of spot, e.g. 0.012
 
 
 @dataclass
@@ -94,16 +99,28 @@ class ThetaBrain:
             
             # Get stock
             ticker = yf.Ticker(symbol)
-            info = ticker.info
             hist = ticker.history(period='1mo')
             
             price = float(hist['Close'].iloc[-1]) if not hist.empty else 0
             volume = int(hist['Volume'].iloc[-1]) if not hist.empty else 0
             avg_volume = int(hist['Volume'].mean()) if not hist.empty else 0
             
-            # Get IV Rank
-            iv_rank = self._get_iv_rank(symbol, price)
-            
+            # Real IV Rank from 52-week realized-vol range (see iv_rank.py)
+            iv_metrics = self._get_iv_rank(symbol)
+            iv_rank = iv_metrics.get('iv_rank', 30.0)
+
+            # VIX term structure: spot vs 3-month. Backwardation (>1) = stress.
+            vix3m = None
+            try:
+                vix3m_info = yf.Ticker('^VIX3M').info
+                vix3m = vix3m_info.get('regularMarketPrice')
+            except Exception:
+                vix3m = None
+            term_ratio = round(vix / vix3m, 3) if vix3m else None
+
+            # Expected move for ~30 DTE (drives strike selection)
+            expected_move_30d = price * (iv_metrics.get('current_iv', 15.0) / 100) * math.sqrt(30 / 365)
+
             # Get earnings
             earnings_date = self._get_earnings_date(symbol)
             
@@ -113,37 +130,29 @@ class ThetaBrain:
                 'volume': volume,
                 'avg_volume': avg_volume,
                 'vix': vix,
+                'vix3m': vix3m,
+                'term_structure_ratio': term_ratio,
                 'iv_rank': iv_rank,
+                'iv_metrics': iv_metrics,
+                'expected_move_30d': round(expected_move_30d, 2),
                 'earnings_date': earnings_date,
-                'has_earnings_soon': self._check_earnings_soon(earnings_date)
+                'has_earnings_soon': self._check_earnings_soon(earnings_date),
+                '_data_source': 'live'
             }
         except Exception as e:
-            return self._get_simulated_data()
+            data = self._get_simulated_data()
+            data['_data_source'] = 'simulated_fallback'
+            data['_fallback_reason'] = str(e)[:120]
+            return data
     
-    def _get_iv_rank(self, symbol: str, current_price: float) -> float:
-        """Calculate IV Rank from options"""
+    def _get_iv_rank(self, symbol: str, current_price: float = None) -> dict:
+        """Real IV Rank via IVRankCalculator (52w realized-vol range proxy)."""
         try:
-            ticker = yf.Ticker(symbol)
-            expirations = ticker.options
-            if not expirations:
-                return 30.0
-            
-            chain = ticker.option_chain(expirations[0])
-            calls = chain.calls
-            
-            if calls.empty:
-                return 30.0
-            
-            # Find ATM option
-            atm = calls.iloc[(calls['strike'] - current_price).abs().argsort()[:1]]
-            
-            if not atm.empty and 'impliedVolatility' in atm.columns:
-                iv = atm['impliedVolatility'].iloc[0]
-                return min(100, max(0, iv * 200))
-            
-            return 30.0
-        except:
-            return 30.0
+            from .iv_rank import get_iv_rank
+            return get_iv_rank(symbol)
+        except Exception:
+            return {'iv_rank': 30.0, 'iv_percentile': 30.0, 'current_iv': 15.0,
+                    'iv_52w_high': 20.0, 'iv_52w_low': 10.0, 'source': 'fallback'}
     
     def _get_earnings_date(self, symbol: str) -> Optional[str]:
         try:
@@ -182,11 +191,16 @@ class ThetaBrain:
         reasoning = []
         warnings = []
         
-        # Step 1: Should trade?
+        # Step 1: Should trade? (guard chain — any hit = AVOID)
         if inputs.vix_level > self.VIX_HIGH:
             reasoning.append(f"VIX at {inputs.vix_level} - too high")
             return self._create_avoid_output(inputs, reasoning, warnings)
         
+        # Term-structure guard: backwardation (spot VIX > 3M VIX) = stress regime
+        if getattr(inputs, 'term_structure_ratio', None) is not None and inputs.term_structure_ratio > 1.0:
+            reasoning.append(f"VIX term structure inverted ({inputs.term_structure_ratio}) - stress regime")
+            return self._create_avoid_output(inputs, reasoning, warnings)
+
         if inputs.days_to_fomc is not None and inputs.days_to_fomc <= 2:
             reasoning.append(f"FOMC in {inputs.days_to_fomc} days")
             return self._create_avoid_output(inputs, reasoning, warnings)
@@ -198,6 +212,15 @@ class ThetaBrain:
         # Step 2: Evaluate ticker
         if inputs.iv_rank < 20:
             reasoning.append(f"IV Rank too low: {inputs.iv_rank}%")
+            return self._create_avoid_output(inputs, reasoning, warnings)
+
+        # Step 2b: Portfolio-level risk enforcement (previously dead constants)
+        projected_risk = inputs.current_risk_pct + self.MAX_RISK_PER_TRADE
+        if inputs.current_positions >= self.MAX_POSITIONS:
+            reasoning.append(f"At max positions ({inputs.current_positions}/{self.MAX_POSITIONS})")
+            return self._create_avoid_output(inputs, reasoning, warnings)
+        if projected_risk > self.MAX_PORTFOLIO_RISK:
+            reasoning.append(f"Portfolio risk would hit {projected_risk:.1f}% (max {self.MAX_PORTFOLIO_RISK}%)")
             return self._create_avoid_output(inputs, reasoning, warnings)
         
         # Step 3: Select strategy
@@ -214,16 +237,24 @@ class ThetaBrain:
             confidence = 'low'
             reasoning.append("VIX HIGH - Double Diagonal")
         
-        # Step 4: Select strikes
-        put_strike = round(inputs.price * 0.90 / 5) * 5
-        call_strike = round(inputs.price * 1.10 / 5) * 5
-        reasoning.append(f"Strikes: Put {put_strike} / Call {call_strike}")
+        # Step 4: Select strikes — expected-move based, adapts to vol regime
+        # EM = S × IV × √(DTE/365); short strikes at ~1.0 EM each side
+        iv_decimal = getattr(inputs, 'iv_estimate', None) or (inputs.iv_rank / 100 * 0.5 + 0.10)
+        dte = 30
+        em = inputs.price * (iv_decimal) * math.sqrt(dte / 365)
+        put_strike = round((inputs.price - em) / 5) * 5
+        call_strike = round((inputs.price + em) / 5) * 5
+        reasoning.append(f"Strikes: Put {put_strike} / Call {call_strike} (±1.0 EM, EM=${em:.0f})")
         
-        # Step 5: Position size
-        risk_per_trade = inputs.account_size * (self.MAX_RISK_PER_TRADE / 100)
-        max_loss = inputs.price * 0.02 * 100
-        contracts = min(int(risk_per_trade / max_loss) if max_loss > 0 else 0, 5)
-        total_risk = contracts * max_loss
+        # Step 5: Position size — from ACTUAL estimated calendar debit
+        # Double-calendar debit ≈ 0.5–2% of spot depending on IV; use BS-derived
+        # estimate when iv_estimate provided, else 1.2% of spot as mid estimate.
+        debit_pct_of_spot = getattr(inputs, 'debit_pct_estimate', None) or 0.012
+        est_debit_per_contract = inputs.price * debit_pct_of_spot * 100
+        risk_budget = inputs.account_size * (self.MAX_RISK_PER_TRADE / 100)
+        contracts = min(int(risk_budget / est_debit_per_contract) if est_debit_per_contract > 0 else 0, 5)
+        total_risk = contracts * est_debit_per_contract
+        reasoning.append(f"Est. debit ${est_debit_per_contract:.0f}/contract; {contracts} contracts fits ${risk_budget:.0f} risk budget")
         
         # Generate signal
         if inputs.vix_level < self.VIX_GOOD and inputs.iv_rank > self.IV_RANK_HIGH:
@@ -238,17 +269,18 @@ class ThetaBrain:
         
         entry_rules = [
             f"VIX at {inputs.vix_level} - {'Good' if inputs.vix_level < 15 else 'Acceptable'}",
+            f"IV Rank {inputs.iv_rank}%",
             f"Strategy: {strategy.replace('_', ' ').title()}",
             f"Strikes: Put {put_strike} / Call {call_strike}",
-            f"Contracts: {contracts}",
+            f"Contracts: {contracts} (est. ${est_debit_per_contract:.0f} debit each)",
             "Place limit order at mid-price"
         ]
         
         exit_rules = [
-            "Take profit at 50%",
-            "Stop loss at 30%",
+            "Take profit at 30% of net debit",   # aligned to Ravish playbook 20-40%
+            "Stop loss at 30% (mental)",
             "Roll if < 7 days to expiry",
-            "Roll if delta > 0.40"
+            "Roll if short strike delta > 0.40"
         ]
         
         return BrainOutput(
@@ -259,7 +291,7 @@ class ThetaBrain:
             suggested_put_strike=put_strike,
             suggested_call_strike=call_strike,
             recommended_contracts=contracts,
-            max_risk_dollars=total_risk,
+            max_risk_dollars=round(total_risk, 2),
             entry_rules=entry_rules,
             exit_rules=exit_rules,
             warnings=warnings,

@@ -275,6 +275,9 @@ class BrainAnalyzeRequest(BaseModel):
     current_positions: int = 0
     account_size: float = 10000
     current_risk_pct: float = 5.0
+    term_structure_ratio: Optional[float] = None
+    iv_estimate: Optional[float] = None
+    debit_pct_estimate: Optional[float] = None
 
 
 class BrainOutputResponse(BaseModel):
@@ -794,7 +797,10 @@ async def analyze_trade(request: BrainAnalyzeRequest):
         days_to_earnings=request.days_to_earnings,
         current_positions=request.current_positions,
         account_size=request.account_size,
-        current_risk_pct=request.current_risk_pct
+        current_risk_pct=request.current_risk_pct,
+        term_structure_ratio=request.term_structure_ratio,
+        iv_estimate=request.iv_estimate,
+        debit_pct_estimate=request.debit_pct_estimate
     )
     return brain.analyze(inputs)
 
