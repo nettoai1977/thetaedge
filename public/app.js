@@ -1027,6 +1027,7 @@ function loadCalendarData() {
     
     // Market hours in NZ time — computed dynamically (handles US + NZ DST automatically)
     renderMarketHoursNZ();
+    startMarketClock();
     
     // Load upcoming events
     loadUpcomingEvents();
@@ -1074,6 +1075,125 @@ function renderMarketHoursNZ() {
     } catch (e) {
         console.warn('Market-hours render failed:', e);
     }
+}
+
+// ============ Market Countdown Clock ============
+// Convert an ET wall-clock on a given NY date to an absolute UTC timestamp.
+// Iterative Intl trick handles US DST boundaries correctly.
+function etWallToUTC(y, mo, d, h, min) {
+    const target = Date.UTC(y, mo, d, h, min, 0);
+    const fmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    let guess = target;
+    for (let i = 0; i < 3; i++) {
+        const p = Object.fromEntries(fmt.formatToParts(new Date(guess)).map(x => [x.type, x.value]));
+        const nyAsUTC = Date.UTC(+p.year, +p.month - 1, +p.day, (+p.hour) % 24, +p.minute, +p.second);
+        guess += (target - nyAsUTC);
+    }
+    return guess;
+}
+
+function isUSMarketHoliday(y, mo, d) {
+    // mo is 0-indexed; getHolidayDates() comes from api.js (dynamic, current year)
+    const iso = `${y}-${String(mo + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const holidays = (typeof getHolidayDates === 'function')
+        ? [...getHolidayDates(y), ...getHolidayDates(y + 1)].map(h => h.date)
+        : [];
+    return holidays.includes(iso);
+}
+
+function findNextTradingDay(y, mo, d) {
+    // Returns {y, mo, d} of the next weekday that is NOT a US holiday (skips today)
+    const probe = new Date(Date.UTC(y, mo, d));
+    for (let i = 0; i < 20; i++) {
+        probe.setUTCDate(probe.getUTCDate() + 1);
+        const dow = probe.getUTCDay();
+        if (dow === 0 || dow === 6) continue;
+        if (isUSMarketHoliday(probe.getUTCFullYear(), probe.getUTCMonth(), probe.getUTCDate())) continue;
+        return { y: probe.getUTCFullYear(), mo: probe.getUTCMonth(), d: probe.getUTCDate() };
+    }
+    return null;
+}
+
+function nzTimeString(utcMs) {
+    return new Intl.DateTimeFormat('en-NZ', {
+        timeZone: 'Pacific/Auckland',
+        weekday: 'short', hour: 'numeric', minute: '2-digit', hour12: true
+    }).format(new Date(utcMs));
+}
+
+let marketClockTimer = null;
+
+function marketClockTick() {
+    const el = document.getElementById('marketCountdown');
+    if (!el) return; // tab not in DOM view
+
+    // Current NY wall-clock components
+    const fmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', weekday: 'short', hour12: false });
+    const p = Object.fromEntries(fmt.formatToParts(new Date()).map(x => [x.type, x.value]));
+    const y = +p.year, mo = +p.month - 1, d = +p.day;
+    const nowNum = (+p.hour) * 60 + +p.minute + (+p.second) / 60;
+    const isWeekend = p.weekday === 'Sat' || p.weekday === 'Sun';
+    const isHoliday = isUSMarketHoliday(y, mo, d);
+
+    let mode, targetUTC, targetLabel;
+    if (isWeekend || isHoliday) {
+        const nxt = findNextTradingDay(y, mo, d);
+        if (!nxt) return;
+        mode = 'opens';
+        targetUTC = etWallToUTC(nxt.y, nxt.mo, nxt.d, 9, 30);
+        targetLabel = isHoliday ? 'Holiday — US market closed' : 'Weekend — US market closed';
+    } else if (nowNum < 9 * 60 + 30) {
+        mode = 'opens';
+        targetUTC = etWallToUTC(y, mo, d, 9, 30);
+        targetLabel = 'Pre-market in progress';
+    } else if (nowNum < 16 * 60) {
+        mode = 'closes';
+        targetUTC = etWallToUTC(y, mo, d, 16, 0);
+        targetLabel = 'Market open — regular session';
+    } else {
+        const nxt = findNextTradingDay(y, mo, d);
+        if (!nxt) return;
+        mode = 'opens';
+        targetUTC = etWallToUTC(nxt.y, nxt.mo, nxt.d, 9, 30);
+        targetLabel = 'After-hours in progress';
+    }
+
+    const diffMs = targetUTC - Date.now();
+    if (diffMs <= 0) { renderCountdown(el, mode, 0, targetLabel, targetUTC); return; }
+
+    const days = Math.floor(diffMs / 86400000);
+    const hours = Math.floor((diffMs % 86400000) / 3600000);
+    const mins = Math.floor((diffMs % 3600000) / 60000);
+    const secs = Math.floor((diffMs % 60000) / 1000);
+    renderCountdown(el, mode, { days, hours, mins, secs }, targetLabel, targetUTC);
+}
+
+function renderCountdown(el, mode, t, targetLabel, targetUTC) {
+    const color = mode === 'closes' ? 'text-green-400' : 'text-cyan-400';
+    let parts;
+    if (t === 0) {
+        parts = '<span class="text-2xl font-bold">NOW</span>';
+    } else {
+        const seg = (v, l) => `<div class="text-center"><div class="text-xl font-bold tabular-nums">${String(v).padStart(2, '0')}</div><div class="text-[10px] text-slate-500 uppercase">${l}</div></div>`;
+        parts = (t.days > 0 ? seg(t.days, 'days') : '') + seg(t.hours, 'hrs') + seg(t.mins, 'min') + seg(t.secs, 'sec');
+    }
+    el.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-slate-400">${targetLabel}</span>
+            <span class="text-xs font-semibold ${color}">${mode === 'closes' ? 'CLOSES IN' : 'OPENS IN'}</span>
+        </div>
+        <div class="flex items-center justify-center gap-3 mb-2">${parts}</div>
+        <p class="text-xs text-slate-400 text-center">${mode === 'closes' ? 'Closes' : 'Opens'} ${nzTimeString(targetUTC)} (NZ time)</p>
+    `;
+}
+
+function startMarketClock() {
+    if (marketClockTimer) clearInterval(marketClockTimer);
+    marketClockTick();
+    // 1s tick; pause when tab hidden (battery-friendly best practice)
+    marketClockTimer = setInterval(() => {
+        if (!document.hidden) marketClockTick();
+    }, 1000);
 }
 
 function loadUpcomingEvents() {

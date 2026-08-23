@@ -808,6 +808,11 @@
                     <button onclick="showTab('tools')" class="touch-target text-sm text-cyan-400">← Tools</button>
                 </div>
                 
+                <!-- Market Countdown (auto-computed, NZ time) -->
+                <div id="marketCountdown" class="mobile-card mb-4">
+                    <p class="text-xs text-slate-400 text-center py-3">Calculating countdown…</p>
+                </div>
+
                 <!-- Market Status -->
                 <div id="marketStatusCard" class="mobile-card mb-4">
                     <div class="flex items-center justify-between">
@@ -875,6 +880,17 @@
                             <span class="text-sm text-white">Options Expiry</span>
                             <span class="text-xs text-slate-400 ml-auto">3rd Friday monthly</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Novice Guide: how the market clock works -->
+                <div class="mobile-card mt-4">
+                    <h3 class="text-sm font-semibold text-white mb-2">📚 How the market clock works</h3>
+                    <div class="space-y-2 text-xs text-slate-400 leading-relaxed">
+                        <p><span class="text-white font-medium">Why 1:30 AM?</span> The US market opens 9:30 AM New York time. Because NZ is ahead, that's early morning here. The gap shifts by an hour when either country changes to/from daylight saving — this page recalculates automatically.</p>
+                        <p><span class="text-white font-medium">The sessions:</span> <span class="text-yellow-400">Pre-market</span> (4:00–9:30 AM ET) is thin and jumpy. <span class="text-green-400">Regular hours</span> (9:30 AM–4:00 PM ET) is where nearly all trading happens — trade calendars here. <span class="text-orange-400">After-hours</span> (4:00–8:00 PM ET) has low liquidity; avoid market orders.</p>
+                        <p><span class="text-white font-medium">Holidays & weekends:</span> the countdown skips them automatically and targets the next real session.</p>
+                        <p><span class="text-white font-medium">Best calendar entries:</span> first 30–60 min after open are volatile; many traders wait for 10:30 AM ET (2:30 AM NZ) before filling multi-leg orders.</p>
                     </div>
                 </div>
             </div>
