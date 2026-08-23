@@ -575,7 +575,25 @@
             <!-- Tools Tab -->
             <div id="toolsTab" class="hidden">
                 <h1 class="text-2xl font-bold text-white mb-6">Trading Tools</h1>
-                
+
+                <!-- Quick Links: Calendar & Backtest -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="showTab('calendar')" class="mobile-card text-left active:scale-[0.98] transition-transform">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center mb-2">
+                            <span class="text-white text-sm">📅</span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-white">Market Calendar</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">FOMC, CPI, NFP, OPEX & holidays</p>
+                    </button>
+                    <button onclick="showTab('backtest')" class="mobile-card text-left active:scale-[0.98] transition-transform">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center mb-2">
+                            <span class="text-white text-sm">📊</span>
+                        </div>
+                        <h3 class="text-sm font-semibold text-white">Backtest</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">Test strategies on history</p>
+                    </button>
+                </div>
+
                 <!-- ThetaBrain -->
                 <div class="mobile-card mb-4 border-cyan-500/30">
                     <div class="flex items-center space-x-2 mb-3">
@@ -785,7 +803,10 @@
 
             <!-- Calendar Tab -->
             <div id="calendarTab" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-6">US Market Calendar</h1>
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">US Market Calendar</h1>
+                    <button onclick="showTab('tools')" class="touch-target text-sm text-cyan-400">← Tools</button>
+                </div>
                 
                 <!-- Market Status -->
                 <div id="marketStatusCard" class="mobile-card mb-4">
@@ -860,7 +881,10 @@
 
             <!-- Backtest Tab -->
             <div id="backtestTab" class="hidden">
-                <h1 class="text-2xl font-bold text-white mb-6">Backtest</h1>
+                <div class="flex items-center justify-between mb-6">
+                    <h1 class="text-2xl font-bold text-white">Backtest</h1>
+                    <button onclick="showTab('tools')" class="touch-target text-sm text-cyan-400">← Tools</button>
+                </div>
                 
                 <div class="mobile-card mb-4">
                     <div class="grid grid-cols-2 gap-3 mb-4">
