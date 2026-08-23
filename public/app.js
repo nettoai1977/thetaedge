@@ -1,11 +1,13 @@
 // ThetaEdge - Mobile-First App
-// Auth uses SHA-256 hash comparison — no plaintext credentials in source.
-// Default password is "680204" (hashed); change it by updating AUTH_PASSWORD_HASH
-// via console: AUTH_PASSWORD_HASH = await sha256('yourNewPassword')
+// Auth uses SHA-256 hash comparison — the password itself never appears in source.
+// To change the password: run in a browser console
+//   await sha256('yourNewPassword')
+// and replace AUTH_PASSWORD_HASH below with the result.
 const CONFIG = {
     USERNAME: 'netto.ai1977',
-    PASSWORD_HASH: 'a1b2c3d4e5f6a7b8c9d0e0f1a2b3c4d5e5f6a7b8c9d0e0f1a2b3c4d5e5f6a7b8' // placeholder, replaced below
+    AUTH_PASSWORD_HASH: 'c45fb0b04ce5a031c3d129f3efd65f24a129338190617d15e4deaa59b0acd3b5'
 };
+const PASSWORD_HASH = CONFIG.AUTH_PASSWORD_HASH;
 let payoffChart = null;
 let currentStrategy = 'double_calendar';
 
@@ -15,10 +17,6 @@ async function sha256(text) {
     const buf = await crypto.subtle.digest('SHA-256', data);
     return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
-
-(async () => {
-    CONFIG.PASSWORD_HASH = await sha256('680204');
-})();
 
 // ============ Authentication ============
 if (sessionStorage.getItem('authenticated') === 'true') showDashboard();
@@ -30,7 +28,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
     const errorMsg = document.getElementById('errorMsg');
 
     const passHash = await sha256(password);
-    if (username === CONFIG.USERNAME && passHash === CONFIG.PASSWORD_HASH) {
+    if (username === CONFIG.USERNAME && passHash === PASSWORD_HASH) {
         sessionStorage.setItem('authenticated', 'true');
         sessionStorage.setItem('username', username);
         showDashboard();
