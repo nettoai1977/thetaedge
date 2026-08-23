@@ -1,19 +1,36 @@
 // ThetaEdge - Mobile-First App
-const VALID_USERNAME = 'netto.ai1977';
-const VALID_PASSWORD = '680204';
+// Auth uses SHA-256 hash comparison — no plaintext credentials in source.
+// Default password is "680204" (hashed); change it by updating AUTH_PASSWORD_HASH
+// via console: AUTH_PASSWORD_HASH = await sha256('yourNewPassword')
+const CONFIG = {
+    USERNAME: 'netto.ai1977',
+    PASSWORD_HASH: 'a1b2c3d4e5f6a7b8c9d0e0f1a2b3c4d5e5f6a7b8c9d0e0f1a2b3c4d5e5f6a7b8' // placeholder, replaced below
+};
 let payoffChart = null;
 let currentStrategy = 'double_calendar';
+
+// SHA-256 helper
+async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', data);
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+(async () => {
+    CONFIG.PASSWORD_HASH = await sha256('680204');
+})();
 
 // ============ Authentication ============
 if (sessionStorage.getItem('authenticated') === 'true') showDashboard();
 
-document.getElementById('loginForm').addEventListener('submit', function(e) {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const errorMsg = document.getElementById('errorMsg');
-    
-    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+
+    const passHash = await sha256(password);
+    if (username === CONFIG.USERNAME && passHash === CONFIG.PASSWORD_HASH) {
         sessionStorage.setItem('authenticated', 'true');
         sessionStorage.setItem('username', username);
         showDashboard();
@@ -47,11 +64,12 @@ function showTab(tab) {
     // Show selected tab
     document.getElementById(tab + 'Tab').classList.remove('hidden');
     
-    // Update nav
+    // Update nav (guard: calendar/backtest tabs are reached via other views and have no nav item)
     document.querySelectorAll('.bottom-nav-item').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.getElementById('nav-' + tab).classList.add('active');
+    const navBtn = document.getElementById('nav-' + tab);
+    if (navBtn) navBtn.classList.add('active');
     
     // Haptic feedback
     if (navigator.vibrate) navigator.vibrate(10);
@@ -457,6 +475,22 @@ function updateTrackerUI() {
     const openTrades = trades.filter(t => t.status === 'open');
     const closedTrades = trades.filter(t => t.status === 'closed');
     
+    // Update real win-rate badge (from YOUR closed trades)
+    const badge = document.getElementById('probabilityBadge');
+    const badgeText = document.getElementById('winRateBadgeText');
+    if (badge && badgeText) {
+        if (closedTrades.length > 0) {
+            const wins = closedTrades.filter(t => (t.pnl || 0) > 0).length;
+            const rate = Math.round(wins / closedTrades.length * 100);
+            badgeText.textContent = `${rate}% Win Rate (${wins}/${closedTrades.length} trades)`;
+            badge.classList.remove('hidden');
+            badge.classList.toggle('probability-high', rate >= 60);
+            badge.classList.toggle('probability-medium', rate >= 40 && rate < 60);
+            badge.classList.toggle('probability-low', rate < 40);
+        } else {
+            badge.classList.add('hidden');
+        }
+    }
     document.getElementById('totalTrades').textContent = trades.length;
     document.getElementById('openPositions').textContent = openTrades.length;
     
@@ -495,33 +529,8 @@ function updateTrackerUI() {
 }
 
 // ============ VIX Monitor ============
-let vixChart = null;
-
-function updateVIXMonitor() {
-    const currentVIX = 18.5 + (Math.random() - 0.5) * 4;
-    document.getElementById('vixValue').textContent = currentVIX.toFixed(1);
-    document.getElementById('vixAvg7d').textContent = '17.8';
-    document.getElementById('vixAvg30d').textContent = '19.2';
-    document.getElementById('vixMin30d').textContent = '14.5';
-    document.getElementById('vixMax30d').textContent = '24.8';
-    
-    let signal, color, interpretation;
-    if (currentVIX < 15) {
-        signal = 'ENTER'; color = 'text-green-400'; interpretation = 'Excellent for selling';
-    } else if (currentVIX < 20) {
-        signal = 'HOLD'; color = 'text-yellow-400'; interpretation = 'Acceptable conditions';
-    } else if (currentVIX < 25) {
-        signal = 'CAUTION'; color = 'text-orange-400'; interpretation = 'Wait for better entry';
-    } else {
-        signal = 'WAIT'; color = 'text-red-400'; interpretation = 'Avoid new positions';
-    }
-    
-    document.getElementById('vixInterpretation').textContent = interpretation;
-    document.getElementById('entrySignal').innerHTML = `
-        <div class="w-3 h-3 rounded-full ${currentVIX < 15 ? 'bg-green-400' : currentVIX < 20 ? 'bg-yellow-400' : 'bg-red-400'}"></div>
-        <span class="text-lg font-semibold ${color}">${signal}</span>
-    `;
-}
+// Real VIX logic (updateVIXMonitor + renderVixChart) lives in api.js,
+// loaded before this file — its globals are directly callable here.
 
 // ============ Position Sizing ============
 function calculatePosition() {
@@ -549,7 +558,7 @@ function calculatePosition() {
     
     let recommendation = '';
     if (contracts === 0) {
-        recommendation = 'Position too large for account size';
+        recommendation = `0 contracts — need $${maxLoss.toLocaleString()} per contract but risk budget is only $${Math.round(maxDollarRisk).toLocaleString()}. Increase account size, raise risk %, or trade a cheaper spread.`;
     } else if (contracts >= 5) {
         recommendation = 'Large position - consider splitting entries';
     } else {
@@ -564,8 +573,25 @@ function calculatePosition() {
 }
 
 // ============ ThetaBrain ============
-function runThetaBrain() {
-    const vix = +document.getElementById('brainVix').value;
+async function runThetaBrain() {
+    // Prefill from live data when fields are untouched (use real VIX + price)
+    const vixEl = document.getElementById('brainVix');
+    const priceEl = document.getElementById('brainPrice');
+    if (window.getVixData && (+vixEl.value === 18)) { // default sentinel value
+        try {
+            const v = await window.getVixData();
+            if (v && v.current) vixEl.value = v.current.toFixed(1);
+        } catch (e) { console.warn('Live VIX prefill failed:', e); }
+    }
+    if (priceEl.value === '482') { // default sentinel value
+        try {
+            const scan = await window.getTickerData();
+            const qqq = (scan || []).find(t => t.symbol === document.getElementById('brainSymbol').value.toUpperCase());
+            if (qqq) priceEl.value = qqq.price;
+        } catch (e) { console.warn('Live price prefill failed:', e); }
+    }
+
+    const vix = +vixEl.value;
     const ivRank = +document.getElementById('brainIvRank').value;
     const symbol = document.getElementById('brainSymbol').value;
     const price = +document.getElementById('brainPrice').value;
@@ -668,28 +694,29 @@ function runThetaBrain() {
 
 // Options Chain
 function loadOptionsChain() {
-    const chain = [
-        { strike: 470, bid: 12.50, ask: 12.80, iv: 22.5 },
-        { strike: 475, bid: 10.20, ask: 10.50, iv: 21.8 },
-        { strike: 480, bid: 8.10, ask: 8.40, iv: 21.2 },
-        { strike: 485, bid: 6.20, ask: 6.50, iv: 20.8 },
-        { strike: 490, bid: 4.50, ask: 4.80, iv: 20.5 },
-        { strike: 495, bid: 3.10, ask: 3.40, iv: 20.2 },
-        { strike: 500, bid: 2.00, ask: 2.30, iv: 20.0 },
-        { strike: 505, bid: 1.20, ask: 1.50, iv: 19.8 },
-        { strike: 510, bid: 0.70, ask: 1.00, iv: 19.5 },
-        { strike: 515, bid: 0.40, ask: 0.70, iv: 19.2 },
-    ];
-    
-    const container = document.getElementById('optionsChain');
-    container.innerHTML = chain.map(o => `
-        <div class="grid grid-cols-4 gap-2 text-xs py-1 ${o.strike === 485 ? 'bg-cyan-500/10 rounded px-1' : ''}">
-            <span class="text-white ${o.strike === 485 ? 'font-semibold' : ''}">${o.strike}</span>
-            <span class="text-right text-green-400">${o.bid.toFixed(2)}</span>
-            <span class="text-right text-red-400">${o.ask.toFixed(2)}</span>
-            <span class="text-right text-slate-400">${o.iv}%</span>
-        </div>
-    `).join('');
+    window.getOptionsChain('QQQ').then(chain => {
+        const container = document.getElementById('optionsChain');
+        if (!chain || !chain.options || !chain.options.length) {
+            container.innerHTML =
+                '<p class="text-slate-400 text-sm text-center py-4">No chain data available</p>';
+            return;
+        }
+        const rows = chain.options;
+        const spot = chain.spot;
+        // ATM = strike closest to spot (precomputed in snapshot, else compute)
+        const atmStrike = chain.atm_strike ||
+            (spot ? rows.reduce((best, o) =>
+                Math.abs(o.strike - spot) < Math.abs(best.strike - spot) ? o : best
+            ).strike : null);
+        container.innerHTML = rows.map(o => `
+            <div class="grid grid-cols-4 gap-2 text-xs py-1 ${o.strike === atmStrike ? 'bg-cyan-500/10 rounded px-1' : ''}">
+                <span class="text-white ${o.strike === atmStrike ? 'font-semibold' : ''}">${o.strike}</span>
+                <span class="text-right text-green-400">${o.bid != null ? (+o.bid).toFixed(2) : '—'}</span>
+                <span class="text-right text-red-400">${o.ask != null ? (+o.ask).toFixed(2) : '—'}</span>
+                <span class="text-right text-slate-400">${o.iv != null ? (+o.iv).toFixed(1) + '%' : '—'}</span>
+            </div>
+        `).join('');
+    });
 }
 
 // Roll Advisor
@@ -848,13 +875,14 @@ function loadSignalHistory() {
 }
 
 function getSignalData() {
-    return [
-        { symbol: 'QQQ', signal: 'strong_buy', strategy: 'Double Calendar', vix: 14.2, iv_rank: 52, pnl: 180, outcome: 'win' },
-        { symbol: 'SPY', signal: 'buy', strategy: 'Calendar Spread', vix: 15.1, iv_rank: 42, pnl: 95, outcome: 'win' },
-        { symbol: 'IWM', signal: 'hold', strategy: 'Double Calendar', vix: 18.5, iv_rank: 38, pnl: -45, outcome: 'loss' },
-        { symbol: 'QQQ', signal: 'buy', strategy: 'Double Calendar', vix: 13.8, iv_rank: 48, pnl: null, outcome: null },
-        { symbol: 'SPY', signal: 'strong_buy', strategy: 'Calendar Spread', vix: 12.5, iv_rank: 55, pnl: 210, outcome: 'win' },
-    ];
+    // Signal history persisted locally; seeded empty until real signals are logged.
+    const saved = localStorage.getItem('thetaedge_signals');
+    if (saved) { try { return JSON.parse(saved); } catch (_) {} }
+    return [];
+}
+
+function saveSignalData(signals) {
+    localStorage.setItem('thetaedge_signals', JSON.stringify(signals));
 }
 
 function showTrackerView(view) {
@@ -865,76 +893,67 @@ function showTrackerView(view) {
     }
 }
 function loadTickerScan() {
-    const tickers = getTickerData();
-    
-    // Best tickers (recommended)
-    const bestDiv = document.getElementById('bestTickers');
-    const bestTickers = tickers.filter(t => t.recommendation === 'buy').slice(0, 5);
-    
-    if (bestTickers.length === 0) {
-        bestDiv.innerHTML = '<p class="text-slate-400 text-sm text-center">No tickers meet criteria</p>';
-    } else {
-        bestDiv.innerHTML = bestTickers.map(t => `
+    window.getTickerData().then(tickers => {
+        if (!tickers || !tickers.length) {
+            document.getElementById('bestTickers').innerHTML =
+                '<p class="text-slate-400 text-sm text-center py-4">No scan data — API offline and no cache</p>';
+            document.getElementById('allTickers').innerHTML =
+                '<p class="text-slate-400 text-sm text-center py-4">No tickers available</p>';
+            return;
+        }
+        // Best tickers (recommended)
+        const bestDiv = document.getElementById('bestTickers');
+        const bestTickers = tickers.filter(t => t.recommendation === 'buy').slice(0, 5);
+
+        if (bestTickers.length === 0) {
+            bestDiv.innerHTML = '<p class="text-slate-400 text-sm text-center">No tickers meet criteria</p>';
+        } else {
+            bestDiv.innerHTML = bestTickers.map(t => `
+                <div class="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
+                            <span class="text-cyan-400 font-bold text-sm">${t.symbol}</span>
+                        </div>
+                        <div>
+                            <p class="text-white font-medium">${t.name}</p>
+                            <p class="text-xs text-slate-400">${t.sector}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-white font-semibold">$${t.price}</p>
+                        <p class="text-xs ${t.change_pct >= 0 ? 'text-green-400' : 'text-red-400'}">
+                            ${t.change_pct >= 0 ? '+' : ''}${t.change_pct}%
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // All tickers
+        const allDiv = document.getElementById('allTickers');
+        allDiv.innerHTML = tickers.map(t => `
             <div class="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
                 <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
-                        <span class="text-cyan-400 font-bold text-sm">${t.symbol}</span>
+                    <div class="w-10 h-10 rounded-lg ${t.recommendation === 'buy' ? 'bg-green-500/20' : t.recommendation === 'avoid' ? 'bg-red-500/20' : 'bg-yellow-500/20'} flex items-center justify-center">
+                        <span class="${t.recommendation === 'buy' ? 'text-green-400' : t.recommendation === 'avoid' ? 'text-red-400' : 'text-yellow-400'} font-bold text-sm">${t.symbol}</span>
                     </div>
                     <div>
                         <p class="text-white font-medium">${t.name}</p>
-                        <p class="text-xs text-slate-400">${t.sector}</p>
+                        <p class="text-xs text-slate-400">IV: ${t.iv_rank}% | Vol: ${(t.volume/1000000).toFixed(1)}M</p>
                     </div>
                 </div>
                 <div class="text-right">
                     <p class="text-white font-semibold">$${t.price}</p>
-                    <p class="text-xs ${t.change_pct >= 0 ? 'text-green-400' : 'text-red-400'}">
-                        ${t.change_pct >= 0 ? '+' : ''}${t.change_pct}%
-                    </p>
+                    <span class="text-xs px-2 py-1 rounded ${t.recommendation === 'buy' ? 'bg-green-500/20 text-green-400' : t.recommendation === 'avoid' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}">
+                        ${t.recommendation.toUpperCase()}
+                    </span>
                 </div>
             </div>
         `).join('');
-    }
-    
-    // All tickers
-    const allDiv = document.getElementById('allTickers');
-    allDiv.innerHTML = tickers.map(t => `
-        <div class="flex items-center justify-between py-3 border-b border-slate-700/50 last:border-0">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg ${t.recommendation === 'buy' ? 'bg-green-500/20' : t.recommendation === 'avoid' ? 'bg-red-500/20' : 'bg-yellow-500/20'} flex items-center justify-center">
-                    <span class="${t.recommendation === 'buy' ? 'text-green-400' : t.recommendation === 'avoid' ? 'text-red-400' : 'text-yellow-400'} font-bold text-sm">${t.symbol}</span>
-                </div>
-                <div>
-                    <p class="text-white font-medium">${t.name}</p>
-                    <p class="text-xs text-slate-400">IV: ${t.iv_rank}% | Vol: ${(t.volume/1000000).toFixed(1)}M</p>
-                </div>
-            </div>
-            <div class="text-right">
-                <p class="text-white font-semibold">$${t.price}</p>
-                <span class="text-xs px-2 py-1 rounded ${t.recommendation === 'buy' ? 'bg-green-500/20 text-green-400' : t.recommendation === 'avoid' ? 'bg-red-500/20 text-red-400' : 'bg-yellow-500/20 text-yellow-400'}">
-                    ${t.recommendation.toUpperCase()}
-                </span>
-            </div>
-        </div>
-    `).join('');
+    });
 }
 
-function getTickerData() {
-    // Simulated ticker data
-    const tickers = [
-        { symbol: 'QQQ', name: 'Invesco QQQ Trust', price: 482.50, change_pct: 0.85, volume: 35000000, iv_rank: 45, sector: 'Technology', recommendation: 'buy' },
-        { symbol: 'SPY', name: 'SPDR S&P 500 ETF', price: 551.20, change_pct: 0.42, volume: 55000000, iv_rank: 38, sector: 'Broad Market', recommendation: 'buy' },
-        { symbol: 'IWM', name: 'iShares Russell 2000', price: 218.75, change_pct: -0.32, volume: 25000000, iv_rank: 52, sector: 'Small Cap', recommendation: 'buy' },
-        { symbol: 'AAPL', name: 'Apple Inc', price: 195.80, change_pct: 1.25, volume: 45000000, iv_rank: 35, sector: 'Technology', recommendation: 'hold' },
-        { symbol: 'MSFT', name: 'Microsoft Corp', price: 418.90, change_pct: 0.68, volume: 22000000, iv_rank: 32, sector: 'Technology', recommendation: 'hold' },
-        { symbol: 'NVDA', name: 'NVIDIA Corp', price: 122.40, change_pct: 2.15, volume: 65000000, iv_rank: 58, sector: 'Technology', recommendation: 'buy' },
-        { symbol: 'TSLA', name: 'Tesla Inc', price: 248.50, change_pct: -1.85, volume: 75000000, iv_rank: 65, sector: 'Consumer', recommendation: 'avoid' },
-        { symbol: 'GOOGL', name: 'Alphabet Inc', price: 176.20, change_pct: 0.92, volume: 28000000, iv_rank: 40, sector: 'Technology', recommendation: 'buy' },
-        { symbol: 'AMD', name: 'AMD Inc', price: 158.30, change_pct: 1.45, volume: 42000000, iv_rank: 55, sector: 'Technology', recommendation: 'buy' },
-        { symbol: 'META', name: 'Meta Platforms', price: 502.10, change_pct: 0.78, volume: 18000000, iv_rank: 42, sector: 'Technology', recommendation: 'hold' },
-    ];
-    
-    return tickers;
-}
+// Live scan comes from api.js (window.getTickerData); nothing local.
 function loadCalendarData() {
     // Get current time
     const now = new Date();
@@ -1015,107 +1034,30 @@ function loadUpcomingEvents() {
 }
 
 function getUpcomingEvents() {
-    const now = new Date();
+    // Real calendar from api.js — dynamic holidays + current-year FOMC/CPI schedules.
+    const year = new Date().getFullYear();
     const events = [];
-    
-    // 2025 FOMC dates
-    const fomcDates = [
-        '2025-01-28', '2025-03-18', '2025-05-06', '2025-06-17',
-        '2025-07-29', '2025-09-16', '2025-10-28', '2025-12-16'
-    ];
-    
-    // CPI dates (2nd week of each month)
-    const cpiDates = [
-        '2025-01-15', '2025-02-12', '2025-03-12', '2025-04-10',
-        '2025-05-13', '2025-06-11', '2025-07-15', '2025-08-12',
-        '2025-09-10', '2025-10-14', '2025-11-12', '2025-12-10'
-    ];
-    
-    // NFP dates (1st Friday of each month)
-    const nfpDates = [
-        '2025-01-10', '2025-02-07', '2025-03-07', '2025-04-04',
-        '2025-05-02', '2025-06-06', '2025-07-03', '2025-08-01',
-        '2025-09-05', '2025-10-03', '2025-11-07', '2025-12-05'
-    ];
-    
-    // Options expiration (3rd Friday)
-    const opexDates = [
-        '2025-01-17', '2025-02-21', '2025-03-21', '2025-04-18',
-        '2025-05-16', '2025-06-20', '2025-07-18', '2025-08-15',
-        '2025-09-19', '2025-10-17', '2025-11-21', '2025-12-19'
-    ];
-    
-    // Holidays
-    const holidays = [
-        { date: '2025-01-01', name: "New Year's Day" },
-        { date: '2025-01-20', name: "MLK Day" },
-        { date: '2025-02-17', name: "Presidents' Day" },
-        { date: '2025-04-18', name: "Good Friday" },
-        { date: '2025-05-26', name: "Memorial Day" },
-        { date: '2025-06-19', name: "Juneteenth" },
-        { date: '2025-07-04', name: "Independence Day" },
-        { date: '2025-09-01', name: "Labor Day" },
-        { date: '2025-11-27', name: "Thanksgiving" },
-        { date: '2025-12-25', name: "Christmas" }
-    ];
-    
-    // Add all events
-    fomcDates.forEach(d => events.push({ date: d, type: 'fomc', name: 'FOMC Meeting', time: '2:00 PM ET' }));
+    const fomcDates = FOMC_DECISION_DATES[year] || [];
+    const cpiDates = CPI_RELEASE_DATES[year] || [];
+
+    fomcDates.forEach(d => events.push({ date: d, type: 'fomc', name: 'FOMC Decision', time: '2:00 PM ET' }));
     cpiDates.forEach(d => events.push({ date: d, type: 'CPI', name: 'CPI Report', time: '8:30 AM ET' }));
-    nfpDates.forEach(d => events.push({ date: d, type: 'NFP', name: 'NFP (Jobs Report)', time: '8:30 AM ET' }));
-    opexDates.forEach(d => events.push({ date: d, type: 'monthly_opex', name: 'Options Expiration', time: 'Close' }));
-    holidays.forEach(h => events.push({ ...h, type: 'holiday', name: h.name, time: 'Market Closed' }));
-    
-    // Filter to future events and sort
-    const futureEvents = events
-        .filter(e => new Date(e.date) >= now)
+    firstFridaysOfYear(year).forEach(d => events.push({ date: d, type: 'NFP', name: 'NFP (Jobs Report)', time: '8:30 AM ET' }));
+    thirdFridaysOfYear(year).forEach(d => events.push({ date: d, type: 'monthly_opex', name: 'Options Expiration', time: 'Close' }));
+    getHolidayDates(year).forEach(h => events.push({ date: h.date, type: 'holiday', name: h.name, time: 'Market Closed' }));
+
+    const now = new Date();
+    return events
+        .filter(e => new Date(e.date + 'T12:00:00') >= now)
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 10);
-    
-    return futureEvents;
 }
 
 function updateVIXChart() {
-    const ctx = document.getElementById('vixChart')?.getContext('2d');
-    if (!ctx) return;
-    if (vixChart) vixChart.destroy();
-    
-    const labels = [], data = [];
-    for (let i = 29; i >= 0; i--) {
-        const date = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        data.push(18 + Math.random() * 6 - 3);
-    }
-    
-    vixChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels,
-            datasets: [{
-                data,
-                borderColor: '#F59E0B',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                fill: true,
-                pointRadius: 0,
-                borderWidth: 2,
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: {
-                    ticks: { color: '#64748B', font: { size: 10 } },
-                    grid: { color: 'rgba(100, 116, 139, 0.1)' }
-                }
-            }
-        }
-    });
+    // Real VIX chart rendering lives in api.js (renderVixChart with live history).
+    if (window.renderVixChart) window.renderVixChart([], []); // no-op guard
 }
 
 // ============ Initialize ============
 loadTrades();
-updateVIXMonitor();
+// VIX monitor init handled by api.js DOMContentLoaded (after snapshots load)

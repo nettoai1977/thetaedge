@@ -9,6 +9,7 @@
     <title>ThetaEdge - Options Trading Toolkit</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="api.js"></script>
     <link rel="manifest" href="manifest.json">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
@@ -179,9 +180,9 @@
             padding-top: max(16px, env(safe-area-inset-top));
         }
         
-        /* Bottom content padding */
+        /* Bottom content padding (clears the ~72px fixed nav + safe area) */
         .content-bottom {
-            padding-bottom: 100px;
+            padding-bottom: calc(96px + env(safe-area-inset-bottom));
         }
         
         /* Pull to refresh indicator */
@@ -484,11 +485,12 @@
                         </div>
                     </div>
                     
-                    <!-- Probability Badge -->
+                    <!-- Win Rate Badge (computed from YOUR trade history) -->
                     <div class="mb-4">
-                        <div id="probabilityBadge" class="probability-badge probability-high">
-                            <span class="mr-1">🎯</span> 80% Win Rate
+                        <div id="probabilityBadge" class="probability-badge probability-high hidden">
+                            <span class="mr-1">🎯</span> <span id="winRateBadgeText">— Win Rate</span>
                         </div>
+                        <p id="winRateHint" class="text-xs text-slate-500 mt-1">Win rate appears after you log closed trades in the Tracker.</p>
                     </div>
                     
                     <!-- Payoff Chart -->
@@ -1094,13 +1096,6 @@
                 </button>
             </div>
         </nav>
-        
-        <!-- Floating Action Button (Quick Trade) -->
-        <button onclick="calculateStrategy()" class="fab" aria-label="Calculate Strategy">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-            </svg>
-        </button>
     </div>
 
     <script src="app.js"></script>

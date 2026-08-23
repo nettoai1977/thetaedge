@@ -627,6 +627,38 @@ async def get_strategy_breakdown():
     return tracker.get_strategy_breakdown()
 
 
+# ============ Options Chain Endpoints ============
+
+@app.get("/api/chain/{symbol}")
+async def get_options_chain(symbol: str, expiry_index: int = 0):
+    """Get real options chain from Yahoo Finance (ATM row highlighted by frontend)"""
+    from ..engine.options_chain import OptionsChain
+    chain = OptionsChain(symbol).get_chain(expiry_index)
+    # Flatten calls+puts into a single strike-ordered list for the mobile UI
+    strikes = sorted(set([c['strike'] for c in chain['calls']] + [p['strike'] for p in chain['puts']]))
+    call_by_strike = {c['strike']: c for c in chain['calls']}
+    put_by_strike = {p['strike']: p for p in chain['puts']}
+    rows = []
+    for s in strikes:
+        c = call_by_strike.get(s, {})
+        p = put_by_strike.get(s, {})
+        iv = c.get('implied_volatility') or p.get('implied_volatility')
+        rows.append({
+            'strike': s,
+            'bid': c.get('bid', p.get('bid')),
+            'ask': c.get('ask', p.get('ask')),
+            'iv': iv,
+        })
+    return {
+        'symbol': chain['symbol'],
+        'spot': chain['underlying_price'],
+        'expiry': chain['expiry'],
+        'expiry_days': chain['expiry_days'],
+        'options': rows,
+        'expirations': chain['expirations'],
+    }
+
+
 # ============ VIX Monitor Endpoints ============
 
 vix_monitor = VIXMonitor()
