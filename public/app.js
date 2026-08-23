@@ -1023,10 +1023,57 @@ function loadCalendarData() {
     document.getElementById('marketStatus').textContent = status;
     document.getElementById('marketStatus').className = `text-xl font-bold ${statusColor}`;
     document.getElementById('usTime').textContent = usTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'America/New_York' }) + ' ET';
-    document.getElementById('nzTime').textContent = nzTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Pacific/Auckland' }) + ' NZST';
+    document.getElementById('nzTime').textContent = nzTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Pacific/Auckland' }) + ' NZ';
+    
+    // Market hours in NZ time — computed dynamically (handles US + NZ DST automatically)
+    renderMarketHoursNZ();
     
     // Load upcoming events
     loadUpcomingEvents();
+}
+
+// Convert a US Eastern wall-clock time to the equivalent Pacific/Auckland time string.
+// Uses iterative Intl conversion so ET↔UTC offset is correct across US DST changes,
+// then formats the resolved instant in Pacific/Auckland (NZ DST handled by Intl).
+function etToNZ(etHours, etMinutes, usDate) {
+    const y = usDate.getFullYear(), mo = usDate.getMonth();
+    const targetAsUTC = Date.UTC(y, mo, usDate.getDate(), etHours, etMinutes, 0);
+    const fmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    // Iterate: adjust guess until its NY wall-clock equals the requested wall-clock
+    let guess = targetAsUTC;
+    for (let i = 0; i < 3; i++) {
+        const parts = Object.fromEntries(fmt.formatToParts(new Date(guess)).map(p => [p.type, p.value]));
+        const nyAsUTC = Date.UTC(+parts.year, +parts.month - 1, +parts.day, (+parts.hour) % 24, +parts.minute, +parts.second);
+        guess += (targetAsUTC - nyAsUTC);
+    }
+    const nzFmt = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', minute: '2-digit', hour12: true });
+    return nzFmt.format(new Date(guess));
+}
+
+function renderMarketHoursNZ() {
+    const container = document.getElementById('marketHoursNZ');
+    if (!container) return;
+    try {
+        // Use "today" in New York as the reference date (handles DST on both sides)
+        const nowNY = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/New_York' }));
+        const sessions = [
+            { label: 'Pre-Market', start: [4, 0], end: [9, 30] },
+            { label: 'Regular Hours', start: [9, 30], end: [16, 0] },
+            { label: 'After Hours', start: [16, 0], end: [20, 0] }
+        ];
+        container.innerHTML = sessions.map(s => {
+            const nzStart = etToNZ(s.start[0], s.start[1], nowNY);
+            const nzEnd = etToNZ(s.end[0], s.end[1], nowNY);
+            return `
+                <div class="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0">
+                    <span class="text-sm text-slate-400">${s.label}</span>
+                    <span class="text-sm text-white">${nzStart} – ${nzEnd}</span>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        console.warn('Market-hours render failed:', e);
+    }
 }
 
 function loadUpcomingEvents() {
