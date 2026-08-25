@@ -81,6 +81,8 @@ function showTab(tab) {
         loadOptionsChain();
     } else if (tab === 'signals') {
         loadSignalHistory();
+    } else if (tab === 'backtest') {
+        loadBacktestResults();
     }
 }
 
@@ -284,104 +286,61 @@ function updateChart(prices, payoffs) {
 // ============ Backtest ============
 let equityChart = null;
 
-function runBacktest() {
-    const ticker = document.getElementById('btTicker').value;
-    const capital = +document.getElementById('btCapital').value;
-    const startDate = document.getElementById('btStart').value;
-    const endDate = document.getElementById('btEnd').value;
-    
-    // Generate synthetic data
-    const trades = generateBacktestTrades(startDate, endDate, capital);
-    const stats = calculateBacktestStats(trades, capital);
-    
+async function loadBacktestResults() {
     const resultsDiv = document.getElementById('btResults');
-    resultsDiv.innerHTML = `
-        <div class="mobile-card">
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <div class="text-center">
-                    <p class="text-xs text-slate-400">Trades</p>
-                    <p class="text-xl font-bold text-white">${stats.totalTrades}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-xs text-slate-400">Win Rate</p>
-                    <p class="text-xl font-bold text-green-400">${stats.winRate}%</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-xs text-slate-400">Total P&L</p>
-                    <p class="text-xl font-bold ${stats.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}">$${stats.totalPnl.toLocaleString()}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-xs text-slate-400">Sharpe</p>
-                    <p class="text-xl font-bold text-cyan-400">${stats.sharpeRatio}</p>
-                </div>
-            </div>
-            <div style="height: 180px;">
-                <canvas id="equityChart"></canvas>
-            </div>
-        </div>
-    `;
-    
-    updateEquityChart(stats.equityCurve);
-}
-
-function generateBacktestTrades(startDate, endDate, capital) {
-    const trades = [];
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const numWeeks = Math.floor((end - start) / (7 * 24 * 60 * 60 * 1000));
-    
-    let currentPrice = 480;
-    for (let i = 0; i < numWeeks; i++) {
-        const entryDate = new Date(start.getTime() + i * 7 * 24 * 60 * 60 * 1000);
-        const priceChange = (Math.random() - 0.5) * 0.1;
-        currentPrice *= (1 + priceChange);
-        const isWin = Math.random() < 0.75;
-        const pnlPct = isWin ? Math.random() * 30 : -(Math.random() * 30 + 5);
-        const tradeAmount = capital * 0.02;
-        const pnl = tradeAmount * (pnlPct / 100);
-        
-        trades.push({ date: entryDate.toISOString().split('T')[0], pnl, isWin });
+    try {
+        const res = await fetch('data/backtest.json');
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        renderBacktest(await res.json());
+    } catch (e) {
+        console.warn('backtest snapshot unavailable:', e);
+        resultsDiv.innerHTML = `<p class="text-slate-400 text-sm text-center">Validation study not available yet.</p>`;
     }
-    return trades;
 }
 
-function calculateBacktestStats(trades, initialCapital) {
-    let equity = initialCapital;
-    let peak = initialCapital;
-    let maxDrawdown = 0;
-    const equityCurve = [initialCapital];
-    const wins = trades.filter(t => t.isWin);
-    const losses = trades.filter(t => !t.isWin);
-    let totalPnl = 0;
-    
-    trades.forEach(t => {
-        equity += t.pnl;
-        totalPnl += t.pnl;
-        equityCurve.push(equity);
-        if (equity > peak) peak = equity;
-        const dd = ((peak - equity) / peak) * 100;
-        if (dd > maxDrawdown) maxDrawdown = dd;
+function renderBacktest(bt) {
+    const meta = document.getElementById('btMeta');
+    const notes = document.getElementById('btNotes');
+    if (meta) meta.textContent = `${bt.symbol} · ${bt.period_start} → ${bt.period_end} · $1,000 paper account`;
+    if (notes && bt.modeling_notes) notes.textContent = 'Model notes: ' + bt.modeling_notes.join(' · ');
+
+    const p1k = bt.track_portfolio_1k || {};
+    const edge = bt.track_signal_edge || {};
+    const sc = bt.signal_counts || {};
+
+    const card = (label, value, cls) =>
+        `<div class="text-center"><p class="text-xs text-slate-400">${label}</p><p class="text-xl font-bold ${cls || 'text-white'}">${value}</p></div>`;
+
+    let html = `
+        <div class="grid grid-cols-2 gap-3 mb-3">
+            ${card('Final Equity', '$' + (p1k.final_equity != null ? p1k.final_equity.toLocaleString() : '—'), (p1k.final_equity || 0) >= 1000 ? 'text-green-400' : 'text-red-400')}
+            ${card('Return', (p1k.return_pct != null ? p1k.return_pct : '—') + '%', (p1k.return_pct || 0) >= 0 ? 'text-green-400' : 'text-red-400')}
+            ${card('Win Rate', (p1k.win_rate != null ? p1k.win_rate : '—') + '%')}
+            ${card('Max Drawdown', (p1k.max_drawdown_pct != null ? p1k.max_drawdown_pct : '—') + '%', 'text-red-400')}
+            ${card('Closed Trades', p1k.trades != null ? p1k.trades : '—')}
+            ${card('Avg per Trade', p1k.trades ? '$' + ((p1k.total_pnl || 0) / p1k.trades).toFixed(0) : '—', 'text-cyan-400')}
+        </div>
+        <div class="text-xs text-slate-300 mb-2">
+            Signals: ${sc.strong_buy || 0} strong-buy · ${sc.buy || 0} buy · ${sc.hold || 0} hold · ${sc.avoid || 0} avoid
+        </div>
+        <div style="height: 160px;" class="mb-3">
+            <canvas id="equityChart"></canvas>
+        </div>
+        <details class="text-xs text-slate-400">
+            <summary class="cursor-pointer mb-2">Signal-edge check (1 contract per signal, no sizing)</summary>
+            <p>${edge.trades || 0} trades · ${edge.win_rate || 0}% win rate · P&amp;L $${edge.total_pnl || 0} · avg ${(edge.avg_ret_on_debit || 0)}% of debit</p>
+        </details>
+        <h4 class="text-sm font-semibold text-white mt-3 mb-2">Recent simulated trades</h4>
+        <div class="space-y-1">`;
+    (bt.recent_trades || []).slice().reverse().forEach(t => {
+        const cls = t.pnl >= 0 ? 'text-green-400' : 'text-red-400';
+        html += `<div class="flex justify-between text-xs">
+            <span class="text-slate-400">${t.exit} ${t.track === 'portfolio_1k' ? '[acct]' : '[sig]'} x${t.contracts}</span>
+            <span class="${cls}">${String(t.result).toUpperCase()} $${t.pnl}</span></div>`;
     });
-    
-    const avgWin = wins.length > 0 ? wins.reduce((a, b) => a + b.pnl, 0) / wins.length : 0;
-    const avgLoss = losses.length > 0 ? Math.abs(losses.reduce((a, b) => a + b.pnl, 0) / losses.length) : 0;
-    const profitFactor = avgLoss > 0 ? (avgWin * wins.length) / (avgLoss * losses.length) : 999;
-    const returns = trades.map(t => t.pnl / initialCapital);
-    const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length;
-    const stdReturn = Math.sqrt(returns.reduce((a, b) => a + Math.pow(b - avgReturn, 2), 0) / returns.length);
-    const sharpeRatio = stdReturn > 0 ? (avgReturn / stdReturn) * Math.sqrt(52) : 0;
-    
-    return {
-        totalTrades: trades.length,
-        winRate: ((wins.length / trades.length) * 100).toFixed(1),
-        totalPnl: Math.round(totalPnl),
-        avgWin: Math.round(avgWin),
-        avgLoss: Math.round(avgLoss),
-        maxDrawdown: maxDrawdown.toFixed(1),
-        profitFactor: profitFactor.toFixed(2),
-        sharpeRatio: sharpeRatio.toFixed(2),
-        equityCurve
-    };
+    html += '</div>';
+    document.getElementById('btResults').innerHTML = html;
+    updateEquityChart(Object.values(bt.equity_curve || {}));
 }
 
 function updateEquityChart(equityCurve) {
@@ -850,61 +809,73 @@ function deleteAlert(id) {
 loadOptionsChain();
 
 // ============ Signal Tracker ============
-function loadSignalHistory() {
-    const signals = getSignalData();
-    
-    // Calculate performance
-    const closed = signals.filter(s => s.outcome);
-    const wins = closed.filter(s => s.outcome === 'win');
-    const totalPnl = closed.reduce((sum, s) => sum + (s.pnl || 0), 0);
-    const winRate = closed.length > 0 ? (wins.length / closed.length * 100).toFixed(0) : 0;
-    
-    document.getElementById('signalWinRate').textContent = winRate + '%';
-    document.getElementById('signalTotalPnl').textContent = '$' + totalPnl.toLocaleString();
-    document.getElementById('signalProfitFactor').textContent = '1.5';
-    
-    // Display signals
+async function loadSignalHistory() {
+    // Server-generated signals (daily automation) take priority;
+    // locally-logged manual analyses are appended below them.
+    let autoSignals = [];
+    let pf = null;
+    try {
+        const r = await fetch('data/signals.json');
+        if (r.ok) autoSignals = await r.json();
+    } catch (e) { /* static file not present yet */ }
+    try {
+        const r = await fetch('data/portfolio.json');
+        if (r.ok) pf = await r.json();
+    } catch (e) { /* optional */ }
+
+    const localSignals = getSignalData().map(s => ({ ...s, _src: 'manual' }));
+    const merged = [...autoSignals.map(s => ({ ...s, symbol: s.symbol || 'QQQ', _src: 'auto' })),
+                    ...localSignals];
+
+    // Performance cards: prefer real paper-account numbers
+    if (pf) {
+        document.getElementById('signalWinRate').textContent =
+            (pf.win_rate != null ? pf.win_rate : 0) + '%';
+        document.getElementById('signalTotalPnl').textContent =
+            '$' + ((pf.equity || 0) - (pf.account_start || 1000)).toLocaleString();
+        document.getElementById('signalProfitFactor').textContent =
+            pf.return_pct != null ? (pf.return_pct >= 0 ? '+' : '') + pf.return_pct + '%' : '—';
+    } else {
+        document.getElementById('signalWinRate').textContent = '—';
+        document.getElementById('signalTotalPnl').textContent = '—';
+        document.getElementById('signalProfitFactor').textContent = '—';
+    }
+
     const container = document.getElementById('signalList');
-    
-    if (signals.length === 0) {
+    if (!merged.length) {
         container.innerHTML = '<p class="text-slate-400 text-sm text-center">No signals logged yet</p>';
         return;
     }
-    
-    container.innerHTML = signals.slice(0, 10).map(s => {
-        const signalColors = {
-            'strong_buy': 'text-green-400',
-            'buy': 'text-green-400',
-            'hold': 'text-yellow-400',
-            'wait': 'text-orange-400',
-            'avoid': 'text-red-400'
-        };
-        
-        const signalEmoji = {
-            'strong_buy': '🟢🟢',
-            'buy': '🟢',
-            'hold': '🟡',
-            'wait': '🟠',
-            'avoid': '🔴'
-        };
-        
-        return `
-            <div class="py-3 border-b border-slate-700/50 last:border-0">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <span>${signalEmoji[s.signal] || '⚪'}</span>
-                        <span class="text-white font-semibold">${s.symbol}</span>
-                        <span class="text-xs ${signalColors[s.signal]}">${s.signal.toUpperCase()}</span>
-                    </div>
-                    <span class="text-xs text-slate-400">${s.strategy}</span>
+
+    const signalColors = {
+        strong_buy: 'text-green-400', buy: 'text-green-400',
+        hold: 'text-yellow-400', wait: 'text-orange-400', avoid: 'text-red-400'
+    };
+    const signalEmoji = {
+        strong_buy: '🟢🟢', buy: '🟢', hold: '🟡', wait: '🟠', avoid: '🔴'
+    };
+
+    container.innerHTML = merged.slice(0, 12).map(s => `
+        <div class="py-3 border-b border-slate-700/50 last:border-0">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span>${signalEmoji[s.signal] || '⚪'}</span>
+                    <span class="text-white font-semibold">${s.symbol}</span>
+                    <span class="text-xs ${signalColors[s.signal]}">${String(s.signal).toUpperCase()}</span>
+                    ${s._src === 'auto' ? '<span class="text-[9px] px-1 rounded bg-cyan-500/20 text-cyan-300">AUTO</span>' : ''}
                 </div>
-                <div class="flex items-center justify-between mt-1">
-                    <span class="text-xs text-slate-400">VIX: ${s.vix} | IV: ${s.iv_rank}%</span>
-                    <span class="text-xs ${s.pnl >= 0 ? 'text-green-400' : 'text-red-400'}">${s.pnl ? '$' + s.pnl : 'Pending'}</span>
-                </div>
+                <span class="text-xs text-slate-400">${s.strategy || ''}</span>
             </div>
-        `;
-    }).join('');
+            <div class="flex items-center justify-between mt-1">
+                <span class="text-xs text-slate-400">${s.date || ''} | VIX: ${s.vix != null ? s.vix : '—'} | IVR: ${s.iv_rank != null ? Math.round(s.iv_rank) : '—'}%</span>
+                <span class="text-xs text-cyan-400">${s.contracts ? xContracts(s) : ''}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function xContracts(s) {
+    return `${s.strategy.replace(/_/g, ' ')} x${s.contracts} (P${s.put_strike}/C${s.call_strike})`;
 }
 
 function getSignalData() {

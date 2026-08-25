@@ -1,0 +1,23 @@
+{
+ "account_start": 1000.0,
+ "cash": 1000.0,
+ "positions": [
+  {
+   "entry_date": "2026-08-25",
+   "strategy": "calendar_call",
+   "spot": 706.32,
+   "put_k": 660,
+   "call_k": 750,
+   "sigma": 0.22325454705792228,
+   "contracts": 1,
+   "basis": 1.44,
+   "dte_short": 14,
+   "value": 1.44
+  }
+ ],
+ "closed_trades": [],
+ "equity_history": {
+  "2026-08-25": 1000.11
+ },
+ "updated": "2026-08-25T23:08:32.646667"
+}

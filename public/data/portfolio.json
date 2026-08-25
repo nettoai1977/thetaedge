@@ -1,0 +1,19 @@
+{
+ "updated": "2026-08-25T23:08:32.647521",
+ "account_start": 1000.0,
+ "equity": 1000.11,
+ "return_pct": 0.01,
+ "closed_count": 0,
+ "win_rate": null,
+ "open_positions": [
+  {
+   "entry_date": "2026-08-25",
+   "strategy": "calendar_call",
+   "contracts": 1,
+   "basis": 1.44,
+   "value": 1.44,
+   "ret_pct": 0.1
+  }
+ ],
+ "recent_closed": []
+}

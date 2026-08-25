@@ -1,0 +1,16 @@
+[
+ {
+  "date": "2026-08-25",
+  "signal": "avoid",
+  "strategy": null,
+  "put_strike": null,
+  "call_strike": null,
+  "contracts": 0,
+  "spot": 706.32,
+  "vix": 15.85,
+  "iv_rank": 55.1,
+  "reasoning": [
+   "Portfolio risk would hit 16.4% (max 15.0%)"
+  ]
+ }
+]
