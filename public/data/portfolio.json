@@ -1,8 +1,8 @@
 {
- "updated": "2026-08-26T20:43:50.173526",
+ "updated": "2026-08-27T10:00:37.882595",
  "account_start": 1000.0,
- "equity": 997.37,
- "return_pct": -0.26,
+ "equity": 994.07,
+ "return_pct": -0.59,
  "closed_count": 0,
  "win_rate": null,
  "open_positions": [
@@ -11,8 +11,8 @@
    "strategy": "calendar_call",
    "contracts": 1,
    "basis": 1.44,
-   "value": 1.41,
-   "ret_pct": -1.8
+   "value": 1.38,
+   "ret_pct": -4.1
   }
  ],
  "recent_closed": []
