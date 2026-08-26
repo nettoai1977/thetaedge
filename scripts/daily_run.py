@@ -36,7 +36,7 @@ DIV_YIELD = 0.006
 SHORT_DTE = 14      # calendar structure: 14d short leg / 21d long leg
 LONG_DTE = 21
 TP_PCT = 0.30
-SL_PCT = 0.30
+SL_PCT = 0.40       # sweep-validated: wider mental stop lets theta work
 ROLL_DTE = 7
 DELTA_ROLL = 0.40
 

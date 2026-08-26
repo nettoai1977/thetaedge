@@ -1,0 +1,246 @@
+{
+ "top_configs": [
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.2,
+    "sl_pct": 0.2
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.2,
+    "sl_pct": 0.3
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.2,
+    "sl_pct": 0.4
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.3,
+    "sl_pct": 0.2
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.3,
+    "sl_pct": 0.3
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.3,
+    "sl_pct": 0.4
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.4,
+    "sl_pct": 0.2
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.4,
+    "sl_pct": 0.3
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.4,
+    "sl_pct": 0.4
+   },
+   "pnl_1k": 1001.96,
+   "win_rate": 59.1,
+   "trades": 44,
+   "max_dd": -66.71,
+   "return_pct": 200.39,
+   "edge_pnl": 571.31,
+   "edge_trades": 189,
+   "edge_win_rate": 59.3
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 10.0,
+    "tp_pct": 0.3,
+    "sl_pct": 0.4
+   },
+   "pnl_1k": 860.65,
+   "win_rate": 60.0,
+   "trades": 35,
+   "max_dd": -65.65,
+   "return_pct": 172.13,
+   "edge_pnl": 636.19,
+   "edge_trades": 124,
+   "edge_win_rate": 58.1
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 10.0,
+    "tp_pct": 0.4,
+    "sl_pct": 0.4
+   },
+   "pnl_1k": 818.19,
+   "win_rate": 60.0,
+   "trades": 35,
+   "max_dd": -64.56,
+   "return_pct": 163.64,
+   "edge_pnl": 676.05,
+   "edge_trades": 123,
+   "edge_win_rate": 57.7
+  },
+  {
+   "params": {
+    "strike_mode": "pts",
+    "strike_width": 10.0,
+    "tp_pct": 0.4,
+    "sl_pct": 0.3
+   },
+   "pnl_1k": 803.39,
+   "win_rate": 59.5,
+   "trades": 37,
+   "max_dd": -65.89,
+   "return_pct": 160.68,
+   "edge_pnl": 676.05,
+   "edge_trades": 123,
+   "edge_win_rate": 57.7
+  }
+ ],
+ "all_count": 54,
+ "monte_carlo": {
+  "best": {
+   "config": {
+    "strike_mode": "pts",
+    "strike_width": 5.0,
+    "tp_pct": 0.2,
+    "sl_pct": 0.2
+   },
+   "raw_trades": 189,
+   "raw_total_pnl": 571.31,
+   "total_pnl_p05": 145.4,
+   "total_pnl_p50": 569.34,
+   "total_pnl_p95": 1023.57,
+   "mean_per_trade_p05": 0.77,
+   "mean_per_trade_p95": 5.42,
+   "prob_edge_positive": 98.6,
+   "iterations": 2000,
+   "block_size": 5,
+   "avg_ret_on_debit_pct": 12.22,
+   "trades_in_sample": 189
+  },
+  "current_default": {
+   "config": {
+    "strike_mode": "em",
+    "tp_pct": 0.3,
+    "sl_pct": 0.3
+   },
+   "raw_trades": 84,
+   "raw_total_pnl": -130.28,
+   "total_pnl_p05": -999.09,
+   "total_pnl_p50": -133.63,
+   "total_pnl_p95": 755.08,
+   "mean_per_trade_p05": -11.89,
+   "mean_per_trade_p95": 8.99,
+   "prob_edge_positive": 40.9,
+   "iterations": 2000,
+   "block_size": 5,
+   "avg_ret_on_debit_pct": 1.8,
+   "trades_in_sample": 84
+  },
+  "cost_3pct": {
+   "pnl_1k": 865.18,
+   "win_rate": 56.8
+  },
+  "cost_6pct": {
+   "pnl_1k": 728.41,
+   "win_rate": 47.7
+  }
+ }
+}

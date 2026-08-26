@@ -91,9 +91,18 @@ class SimTrade:
 class ThetaBrainBacktester:
     """Replay ThetaBrain decisions on real history."""
 
-    def __init__(self, symbol: str = 'QQQ', lookback_days: int = TEST_DAYS + 320):
+    def __init__(self, symbol: str = 'QQQ', lookback_days: int = TEST_DAYS + 320,
+                 strike_mode: str = 'em', strike_width: float = None,
+                 tp_pct: float = TP_PCT, sl_pct: float = SL_PCT,
+                 cost_pct: float = 0.0):
         self.symbol = symbol
         self.lookback_days = lookback_days
+        # Sweep parameters
+        self.strike_mode = strike_mode      # 'em' (expected move) | 'pts' (fixed pts)
+        self.strike_width = strike_width    # points from spot when mode='pts'
+        self.tp_pct = tp_pct
+        self.sl_pct = sl_pct
+        self.cost_pct = cost_pct            # round-trip spread haircut on value
         self.df = None             # daily frame w/ indicators
         self.trades: list[SimTrade] = []
         self.daily_log: list[dict] = []
@@ -185,9 +194,12 @@ class ThetaBrainBacktester:
             out['strategy'] = 'double_diagonal'
 
         iv_decimal = float(row.rv21) / 100.0
-        em = spot * iv_decimal * math.sqrt(EM_DTE / 365.0)
-        out['put_strike'] = round((spot - em) / 5) * 5
-        out['call_strike'] = round((spot + em) / 5) * 5
+        if self.strike_mode == 'pts' and self.strike_width:
+            half = self.strike_width
+        else:
+            half = spot * iv_decimal * math.sqrt(EM_DTE / 365.0)
+        out['put_strike'] = round((spot - half) / 5) * 5
+        out['call_strike'] = round((spot + half) / 5) * 5
         out['iv_decimal'] = iv_decimal
 
         if vix < 15 and iv_rank > 50:
@@ -273,13 +285,15 @@ class ThetaBrainBacktester:
                 dte_l = dte_total_l - days_held
                 val = self.position_value(S, pos['put_k'], pos['call_k'],
                                           dte_s, dte_l, sigma, pos['strategy'])
+                if self.cost_pct > 0:
+                    val *= (1 - self.cost_pct)
                 basis = pos['basis']
                 ret = val / basis - 1.0
                 action, reason = None, ''
 
-                if ret >= TP_PCT:
+                if ret >= self.tp_pct:
                     action, reason = 'tp', f'take profit +{ret*100:.0f}%'
-                elif ret <= -SL_PCT:
+                elif ret <= -self.sl_pct:
                     action, reason = 'sl', f'stop loss {ret*100:.0f}%'
                 elif dte_s < ROLL_DTE:
                     action, reason = 'roll_close', f'{dte_s} DTE < {ROLL_DTE}'

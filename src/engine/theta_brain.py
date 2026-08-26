@@ -75,13 +75,17 @@ class ThetaBrain:
     VIX_GOOD = 15
     VIX_NORMAL = 20
     VIX_HIGH = 25
-    
+
     IV_RANK_HIGH = 50
     IV_RANK_MEDIUM = 30
-    
+
     MAX_RISK_PER_TRADE = 2.0
     MAX_PORTFOLIO_RISK = 15.0
     MAX_POSITIONS = 5
+
+    # Strike selection — sweep-validated 2026-08-26 (scripts/run_sweep.py):
+    # fixed ±10pt beat EM strikes across all TP/SL combos (+$723 vs +$360 on $1k)
+    STRIKE_WIDTH_PTS = 10.0
     
     def __init__(self):
         self.decision_log = []
@@ -237,14 +241,13 @@ class ThetaBrain:
             confidence = 'low'
             reasoning.append("VIX HIGH - Double Diagonal")
         
-        # Step 4: Select strikes — expected-move based, adapts to vol regime
-        # EM = S × IV × √(DTE/365); short strikes at ~1.0 EM each side
-        iv_decimal = getattr(inputs, 'iv_estimate', None) or (inputs.iv_rank / 100 * 0.5 + 0.10)
+        # Step 4: Select strikes — sweep-validated fixed width (±STRIKE_WIDTH_PTS)
+        # 2026-08-26 study: fixed ±10pt beat EM-based strikes in every TP/SL combo
         dte = 30
-        em = inputs.price * (iv_decimal) * math.sqrt(dte / 365)
-        put_strike = round((inputs.price - em) / 5) * 5
-        call_strike = round((inputs.price + em) / 5) * 5
-        reasoning.append(f"Strikes: Put {put_strike} / Call {call_strike} (±1.0 EM, EM=${em:.0f})")
+        half = self.STRIKE_WIDTH_PTS
+        put_strike = round((inputs.price - half) / 5) * 5
+        call_strike = round((inputs.price + half) / 5) * 5
+        reasoning.append(f"Strikes: Put {put_strike} / Call {call_strike} (±${half:.0f} validated width)")
         
         # Step 5: Position size — from ACTUAL estimated calendar debit
         # Double-calendar debit ≈ 0.5–2% of spot depending on IV; use BS-derived
