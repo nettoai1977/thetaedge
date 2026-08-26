@@ -247,6 +247,28 @@ def main():
                   f'(ret {ret*100:+.0f}%, {p["dte_short"]} DTE)')
 
     # New entry?
+    # ---- INDEPENDENT SAFETY NET (circuit breakers) ----------------------
+    # Hardcoded OUTSIDE the brain: even if ThetaBrain logic is wrong/buggy,
+    # these absolute limits cannot be overridden by any signal.
+    total_pnl_now = sum(t['pnl'] for t in closed)
+    equity_now = ACCOUNT_START + total_pnl_now
+    peak_eq = max([ACCOUNT_START] + list(pf.get('equity_history', {}).values()))
+    drawdown_pct = (peak_eq - equity_now) / peak_eq * 100 if peak_eq > 0 else 0
+    breaker = None
+    if closed and len(closed) >= 3:
+        recent = closed[-3:]
+        if all(t['pnl'] < 0 for t in recent):
+            breaker = 'CIRCUIT BREAKER: 3 consecutive losing trades — ' \
+                      'no new entries for a cooling-off day'
+        elif drawdown_pct > 20:
+            breaker = f'CIRCUIT BREAKER: drawdown {drawdown_pct:.0f}% > 20% cap'
+    elif drawdown_pct > 20:
+        breaker = f'CIRCUIT BREAKER: drawdown {drawdown_pct:.0f}% > 20% cap'
+    if breaker:
+        print(f'  🛑 {breaker}')
+        out.signal = 'avoid'
+        out.reasoning = [breaker]
+
     entered = False
     if out.signal != 'avoid' and len(still_open) < 5:
         strat = out.recommended_strategy
