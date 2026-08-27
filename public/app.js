@@ -860,8 +860,9 @@ async function loadSignalHistory() {
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <div><span class="text-slate-400">Entered:</span> <span class="text-white">${p.entry_date}</span></div>
-                        <div><span class="text-slate-400">Contracts:</span> <span class="text-white">×${p.contracts}</span></div>
+                        <div><span class="text-slate-400">DTE:</span> <span class="text-white">${p.dte_short || '—'} days</span></div>
                         <div><span class="text-slate-400">Strikes:</span> <span class="text-white">P${p.put_k || '—'}/C${p.call_k || '—'}</span></div>
+                        <div><span class="text-slate-400">Contracts:</span> <span class="text-white">×${p.contracts}</span></div>
                         <div><span class="text-slate-400">Debit:</span> <span class="text-white">$${p.basis}/ct</span></div>
                         <div><span class="text-slate-400">Current:</span> <span class="text-white">$${p.value}/ct</span></div>
                     </div>

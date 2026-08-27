@@ -330,6 +330,7 @@ def main():
             {'entry_date': p['entry_date'], 'strategy': p['strategy'],
              'put_k': p.get('put_k'), 'call_k': p.get('call_k'),
              'contracts': p['contracts'], 'basis': p['basis'],
+             'dte_short': p.get('dte_short'),
              'value': round(p['value'], 2),
              'ret_pct': round((p['value'] / p['basis'] - 1) * 100, 1)}
             for p in still_open],

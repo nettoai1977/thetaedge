@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-27T17:11:57.657144",
+ "updated": "2026-08-27T17:14:18.403005",
  "account_start": 1000.0,
  "equity": 994.07,
  "return_pct": -0.59,
@@ -13,6 +13,7 @@
    "call_k": 750,
    "contracts": 1,
    "basis": 1.44,
+   "dte_short": 12,
    "value": 1.38,
    "ret_pct": -4.1
   }
