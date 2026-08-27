@@ -328,6 +328,7 @@ def main():
         'win_rate': round(len(wins) / len(closed) * 100, 0) if closed else None,
         'open_positions': [
             {'entry_date': p['entry_date'], 'strategy': p['strategy'],
+             'put_k': p.get('put_k'), 'call_k': p.get('call_k'),
              'contracts': p['contracts'], 'basis': p['basis'],
              'value': round(p['value'], 2),
              'ret_pct': round((p['value'] / p['basis'] - 1) * 100, 1)}

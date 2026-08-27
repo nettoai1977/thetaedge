@@ -835,6 +835,51 @@ async function loadSignalHistory() {
             '$' + ((pf.equity || 0) - (pf.account_start || 1000)).toLocaleString();
         document.getElementById('signalProfitFactor').textContent =
             pf.return_pct != null ? (pf.return_pct >= 0 ? '+' : '') + pf.return_pct + '%' : '—';
+
+        // Render Paper Portfolio section
+        const pfSection = document.getElementById('paperPortfolio');
+        if (pfSection) {
+            pfSection.style.display = 'block';
+            document.getElementById('pfEquity').textContent = '$' + (pf.equity || 1000).toLocaleString(undefined, {minimumFractionDigits: 2});
+            document.getElementById('pfOpenCount').textContent = (pf.open_positions || []).length;
+            document.getElementById('pfClosedCount').textContent = pf.closed_count || 0;
+
+            // Open positions
+            const openHtml = (pf.open_positions || []).map(p => {
+                const retCls = p.ret_pct >= 0 ? 'text-green-400' : 'text-red-400';
+                const strategyLabel = {
+                    'calendar_call': '📞 Calendar Call',
+                    'double_calendar': '🔄 Double Calendar',
+                    'double_diagonal': '↔️ Double Diagonal'
+                }[p.strategy] || p.strategy;
+                return `
+                <div class="bg-slate-900/70 rounded-lg p-3 border border-slate-700">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-sm font-semibold text-white">${strategyLabel}</span>
+                        <span class="text-xs px-2 py-0.5 rounded ${p.ret_pct >= 0 ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}">${p.ret_pct >= 0 ? '+' : ''}${p.ret_pct}%</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div><span class="text-slate-400">Entered:</span> <span class="text-white">${p.entry_date}</span></div>
+                        <div><span class="text-slate-400">Contracts:</span> <span class="text-white">×${p.contracts}</span></div>
+                        <div><span class="text-slate-400">Strikes:</span> <span class="text-white">P${p.put_k || '—'}/C${p.call_k || '—'}</span></div>
+                        <div><span class="text-slate-400">Debit:</span> <span class="text-white">$${p.basis}/ct</span></div>
+                        <div><span class="text-slate-400">Current:</span> <span class="text-white">$${p.value}/ct</span></div>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('pfOpenPositions').innerHTML = openHtml || '<p class="text-slate-400 text-sm text-center">No open positions</p>';
+
+            // Closed trades
+            const closedEl = document.getElementById('pfClosedTrades');
+            if (pf.recent_closed && pf.recent_closed.length > 0) {
+                closedEl.classList.remove('hidden');
+                const closedHtml = pf.recent_closed.map(t => {
+                    const cls = t.pnl >= 0 ? 'text-green-400' : 'text-red-400';
+                    return `<div class="flex justify-between text-xs"><span class="text-slate-400">${t.exit_date} ${t.strategy} ×${t.contracts}</span><span class="${cls}">${t.result.toUpperCase()} $${t.pnl}</span></div>`;
+                }).join('');
+                closedEl.innerHTML = `<h4 class="text-xs font-semibold text-slate-400 mb-2">Recent Closed</h4>${closedHtml}`;
+            }
+        }
     } else {
         document.getElementById('signalWinRate').textContent = '—';
         document.getElementById('signalTotalPnl').textContent = '—';

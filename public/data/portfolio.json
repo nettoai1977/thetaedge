@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-27T10:00:37.882595",
+ "updated": "2026-08-27T17:11:57.657144",
  "account_start": 1000.0,
  "equity": 994.07,
  "return_pct": -0.59,
@@ -9,6 +9,8 @@
   {
    "entry_date": "2026-08-25",
    "strategy": "calendar_call",
+   "put_k": 660,
+   "call_k": 750,
    "contracts": 1,
    "basis": 1.44,
    "value": 1.38,
