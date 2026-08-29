@@ -1,8 +1,8 @@
 {
- "updated": "2026-08-29T10:00:46.146853",
+ "updated": "2026-08-30T10:00:55.849625",
  "account_start": 1000.0,
- "equity": 985.36,
- "return_pct": -1.46,
+ "equity": 979.69,
+ "return_pct": -2.03,
  "closed_count": 0,
  "win_rate": null,
  "open_positions": [
@@ -13,9 +13,9 @@
    "call_k": 750,
    "contracts": 1,
    "basis": 1.44,
-   "dte_short": 10,
-   "value": 1.29,
-   "ret_pct": -10.2
+   "dte_short": 9,
+   "value": 1.24,
+   "ret_pct": -14.1
   }
  ],
  "recent_closed": []
