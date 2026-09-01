@@ -1,22 +1,19 @@
 {
- "updated": "2026-09-01T10:00:38.394028",
+ "updated": "2026-09-02T10:00:41.851572",
  "account_start": 1000.0,
- "equity": 964.94,
- "return_pct": -3.51,
- "closed_count": 0,
- "win_rate": null,
- "open_positions": [
+ "equity": 955.49,
+ "return_pct": -4.45,
+ "closed_count": 1,
+ "win_rate": 0.0,
+ "open_positions": [],
+ "recent_closed": [
   {
-   "entry_date": "2026-08-25",
+   "exit_date": "2026-09-02",
    "strategy": "calendar_call",
-   "put_k": 660,
-   "call_k": 750,
    "contracts": 1,
-   "basis": 1.44,
-   "dte_short": 7,
-   "value": 1.09,
-   "ret_pct": -24.3
+   "pnl": -44.51,
+   "result": "roll_close",
+   "reason": "6 DTE"
   }
- ],
- "recent_closed": []
+ ]
 }
