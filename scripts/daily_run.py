@@ -347,6 +347,18 @@ def main():
           f'closed {len(closed)} trades, {len(wins)} wins '
           f'({len(wins) / len(closed) * 100:.0f}% win rate)' if closed else
           f'\nPORTFOLIO: equity ${equity:.2f} | no closed trades yet')
+
+    # ---------- BTC RSI(14) reversion paper signal (validated strategy) ----------
+    try:
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from rsi_btc_signal import compute_signal as rsi_signal
+        rs = rsi_signal()
+        print(f'\nBTC RSI(14): {rs["rsi14"]:.1f} | action: {rs["action"]} | '
+              f'closed {rs["closed_trades"]} trades'
+              + (f', cum PnL {rs["cum_pnl_usd"]:+.2f} USD' if rs["closed_trades"] else ''))
+    except Exception as e:
+        print(f'\nBTC RSI(14): signal error: {e}')
+
     print(f'Done. Signal saved to signals.json, portfolio updated.')
 
 

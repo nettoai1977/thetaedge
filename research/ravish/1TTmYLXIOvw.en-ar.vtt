@@ -1,0 +1,1000 @@
+WEBVTT
+Kind: captions
+Language: en-AR
+
+00:00:00.680 --> 00:00:05.400
+The first step to forging a new path is to question the path you have learned in order to discover that it was
+
+00:00:05.400 --> 00:00:10.120
+not the only path.  Anthropic continues to make history with its products in
+
+00:00:10.120 --> 00:00:14.880
+the field of artificial intelligence.  Not only did it provide cloud-based models that
+
+00:00:14.880 --> 00:00:19.880
+consistently rank among the best, but it also improved the application and features at a rapid pace that has
+
+00:00:19.880 --> 00:00:24.560
+now made it one of the best platforms.  However, what really sets it apart is not the
+
+00:00:24.560 --> 00:00:31.200
+chat mode, but the Corde function.  These advanced options are available exclusively to paid plans.  But is there a
+
+00:00:31.200 --> 00:00:36.280
+way to activate it?  The answer is yes.  To find out,
+
+00:00:36.280 --> 00:00:40.960
+we will explore five use cases, including adding any model to the cloud.  With one click,
+
+00:00:40.960 --> 00:00:46.360
+we will connect different AI providers, including official providers, without
+
+00:00:46.360 --> 00:00:51.240
+losing any cloud functionality, as well as other use cases.  Moreover, you can
+
+00:00:51.240 --> 00:01:01.360
+apply every method we will discuss today completely free of charge.  Isn't this amazing?  So let's start by seeing how we'll
+
+00:01:01.360 --> 00:01:07.240
+begin with a new release that completely changes Olama's interface.  This release adds
+
+00:01:07.240 --> 00:01:12.560
+new buttons that enable us to edit and open the cloud code with a single click
+
+00:01:12.560 --> 00:01:17.520
+for any form we want, whether it runs on the cloud or
+
+00:01:17.520 --> 00:01:21.400
+can be run locally.  This means that we can now use it not only for
+
+00:01:21.400 --> 00:01:26.640
+free, but also with unlimited and private access to explore how it works.  Let's move on to Olama, a
+
+00:01:26.640 --> 00:01:31.320
+platform that has completely changed its website with this
+
+00:01:31.320 --> 00:01:36.880
+new release, now clearly focusing on running open-source models to provide
+
+00:01:36.880 --> 00:01:41.520
+more freedom.  To install it on your device, you need to
+
+00:01:41.520 --> 00:01:45.800
+click the download button.  Note that for
+
+00:01:45.800 --> 00:01:50.680
+macOS and Windows devices, we will have a simple installer.  As for
+
+00:01:50.680 --> 00:01:54.800
+Linux systems, we will also have this option from the command line.  Simply run the command
+
+00:01:54.800 --> 00:01:59.000
+and the application will appear.  Once installed, you will see an interface like this
+
+00:01:59.000 --> 00:02:04.640
+.  But before we review this new feature and how to unlock the cloud, the
+
+00:02:04.640 --> 00:02:09.360
+first thing we need to do is install the application, even if we do
+
+00:02:09.360 --> 00:02:12.800
+n't have a paid license.  To do that, simply go to the link
+
+00:02:12.800 --> 00:02:15.880
+that I will put in the description below, in addition to everything we will cover in this
+
+00:02:15.880 --> 00:02:20.360
+video.  There you will find that you can download it on almost all devices.
+
+00:02:20.360 --> 00:02:26.120
+After installation, you will see an interface similar to this, but unless you are subscribed to the
+
+00:02:26.120 --> 00:02:30.360
+paid version, as I am, you will not find the Cowork feature,
+
+00:02:30.360 --> 00:02:35.920
+which allows you to automate tasks, nor the
+
+00:02:35.920 --> 00:02:40.320
+cloud icon feature shown here.  But using the method we will explain, we will be able to
+
+00:02:40.320 --> 00:02:44.680
+unlock all of these features with any other subscription model.  To do this,
+
+00:02:44.680 --> 00:02:49.080
+if we go back to the Dorama app, you will notice that they have highlighted the
+
+00:02:49.080 --> 00:02:54.640
+app feature.  From here, we can distinguish between the Cloud Desktop application, because
+
+00:02:54.640 --> 00:02:59.960
+if we click on this button, it will ask us if we want to restart the
+
+00:02:59.960 --> 00:03:04.920
+Cloud Desktop application to open it and link it to other models besides the
+
+00:03:04.920 --> 00:03:10.440
+cloud models.  If we click on it, it will restart immediately.  Although
+
+00:03:10.440 --> 00:03:15.640
+everything looks exactly the same, from the chat mode and co-working mode to the
+
+00:03:15.640 --> 00:03:21.080
+cloud programming mode, just like in the paid version, note that in the
+
+00:03:21.080 --> 00:03:26.840
+bottom right corner, I don’t have a connected professional account, but rather an account linked to Olama that allows
+
+00:03:26.840 --> 00:03:31.920
+access to all these features.  The reason is... if you go back to the main screen,
+
+00:03:31.920 --> 00:03:37.480
+you will see that from here, in the templates section, we can now link it to any
+
+00:03:37.480 --> 00:03:42.200
+template we want.  This is essential, because Olama already works with all
+
+00:03:42.200 --> 00:03:46.840
+open-source models, whether local or cloud-based.  But remember that in
+
+00:03:46.840 --> 00:03:51.240
+later cases, we will also see how to relate it to special models, even our own.
+
+00:03:51.240 --> 00:03:55.280
+Anthropic.  What's interesting about what we just saw with Olama is the possibility of making Clot
+
+00:03:55.280 --> 00:04:00.480
+Desktop independent of a specific model or company.  It seems to me that this philosophy is fundamental
+
+00:04:00.480 --> 00:04:05.520
+, because depending on the task, one model may be better than another.  For this reason, I would like to
+
+00:04:05.520 --> 00:04:10.720
+introduce you to Mammoth AI, a platform that brings together many of the best AI models
+
+00:04:10.720 --> 00:04:15.360
+from leading companies in one place.  Through a single interface, you can
+
+00:04:15.360 --> 00:04:22.840
+access templates such as GPT, CLUT, Gemini, GROC, TEPEK, LAMA, and many more, and choose the template that best suits you at
+
+00:04:22.840 --> 00:04:27.800
+any time.  If the answer is not convincing, you can resend the same request,
+
+00:04:27.800 --> 00:04:32.520
+but with a completely different format.  Furthermore, we will have templates available in
+
+00:04:32.520 --> 00:04:37.560
+almost any format.  You can create images, videos, conduct AI research, work with
+
+00:04:37.560 --> 00:04:43.320
+inference models, or use lighter options when you need faster answers.  But here,
+
+00:04:43.320 --> 00:04:48.200
+to further develop this idea, Mammoth also has its own API platform.
+
+00:04:48.200 --> 00:04:54.480
+This is compatible with OpenI, and allows you to link all the standardized forms in its system to any
+
+00:04:54.480 --> 00:04:59.240
+of your own tools, enabling you to continue your workflow smoothly.
+
+00:04:59.240 --> 00:05:04.560
+This gives you a more flexible workflow without relying on a single provider.  All this with
+
+00:05:04.560 --> 00:05:10.680
+one free subscription starting from 10 euros per month.  Thanks to the sponsors of
+
+00:05:10.680 --> 00:05:14.120
+this video who left me a link which I will put in the description below for you
+
+00:05:14.120 --> 00:05:23.400
+to try for yourself.  Now that we know that, let's take a look at the following use case.  [Music]
+
+00:05:23.400 --> 00:05:27.920
+In this second section, we will talk about open-source models, given
+
+00:05:27.920 --> 00:05:32.520
+their remarkable development in the field of artificial intelligence, to the point that they even surpass
+
+00:05:32.520 --> 00:05:38.360
+closed, paid models.  In fact, Olama shared a tweet this week with this graph showing a
+
+00:05:38.360 --> 00:05:43.440
+significant increase in the use of open-source models
+
+00:05:43.440 --> 00:05:49.000
+.  This is not due to the Dama platform itself, but rather to the quality of
+
+00:05:49.000 --> 00:05:54.240
+the models that are offered as open source.  A
+
+00:05:54.240 --> 00:06:00.360
+few weeks ago, Alibaba launched Quen 3.8 Max, a model that has been ranked among the best
+
+00:06:00.360 --> 00:06:05.160
+artificial intelligence models.  Chemistry 3 also excelled in the user interface category, even
+
+00:06:05.160 --> 00:06:12.160
+surpassing Fable 5. Prior to that, GLM 5.3 was released, achieving
+
+00:06:12.160 --> 00:06:16.480
+first place in most rankings.  These three models share one characteristic
+
+00:06:16.480 --> 00:06:21.080
+: they are all open source.  But it didn't stop there.  Just one week ago,
+
+00:06:21.080 --> 00:06:25.680
+these updates that we discussed on this channel were released, and in the same week,
+
+00:06:25.680 --> 00:06:30.200
+just two or three days ago, these
+
+00:06:30.200 --> 00:06:37.200
+open-source models continued to receive updates.  GLM 5.3, Flash version, was recently released.  It was widely circulated under the name
+
+00:06:37.200 --> 00:06:43.840
+OX Alfa, and everyone speculated that it might be the Yine 4 Pro, but Zi finally revealed that it was their
+
+00:06:43.840 --> 00:06:48.880
+own model.  We also found new versions released a few days ago,
+
+00:06:48.880 --> 00:06:54.720
+such as the Quen 3.8 Flash version, which not only has an excellent location, but
+
+00:06:54.720 --> 00:07:00.800
+also a very low cost, allowing entry of one million entries for only 15 cents, and the
+
+00:07:00.800 --> 00:07:06.520
+cost of one million tokens does not exceed 50 cents.  This is extremely important because, in addition to
+
+00:07:06.520 --> 00:07:11.480
+the possibility of using very cheap and effective templates, it encourages other service providers
+
+00:07:11.480 --> 00:07:16.800
+to pitch their offerings strongly and provide these powerful templates for
+
+00:07:16.800 --> 00:07:22.600
+free.  We will be able to connect this to our open cloud, eliminating any need to
+
+00:07:22.600 --> 00:07:26.720
+worry about restrictions.  To understand this, let's go back to where we started with the
+
+00:07:26.720 --> 00:07:32.040
+Olama open cloud, and talk about all the free cloud models
+
+00:07:32.040 --> 00:07:36.080
+that we can use from this provider.  By default, we will review only one model.  In this
+
+00:07:36.080 --> 00:07:42.480
+case, we have YMA 4 with 31 billion coefficients, which is a really excellent model,
+
+00:07:42.480 --> 00:07:46.920
+but remember that we can also link other models from the same provider.
+
+00:07:46.920 --> 00:07:51.800
+To do that, let's test it first, starting with the conversation by asking: "Hello,
+
+00:07:51.800 --> 00:07:56.040
+how are you?"  We will press send, and from here, as we can see, the response is given... This is done almost
+
+00:07:56.040 --> 00:08:00.920
+instantly with all cloud animations, but using an
+
+00:08:00.920 --> 00:08:05.680
+open-source model.  We will be able to use this same approach for
+
+00:08:05.680 --> 00:08:10.800
+other cloud functions.  But before we get into that, let's go back to the Dolama platform, where it is necessary to
+
+00:08:10.800 --> 00:08:15.440
+click on the settings section.  In addition to adjusting some
+
+00:08:15.440 --> 00:08:20.040
+parameters here, the most important thing is to have a section dedicated to the
+
+00:08:20.040 --> 00:08:24.880
+cloud desktop application.  From here, we can replace the models we had
+
+00:08:24.880 --> 00:08:31.080
+in the cloud with our own models.  Note that by default, in Sonnet 5, we have the
+
+00:08:31.080 --> 00:08:35.720
+Yma 4 model, which is the specific model we have been using, but I can also identify
+
+00:08:35.720 --> 00:08:42.200
+powerful models that I would like to replace with the F model, such as the Minimx M3 model.  In
+
+00:08:42.200 --> 00:08:48.440
+OPU 5, we can replace it with another model, such as Deepsic V4 Pro.
+
+00:08:48.440 --> 00:08:53.160
+In the end, I would adjust the rest of the models in this way.  Note that when you click on
+
+00:08:53.160 --> 00:08:58.240
+this selector, some options will appear in gray, which means they require a plan.
+
+00:08:58.240 --> 00:09:01.800
+However, we will see later how to link it to any other provider
+
+00:09:01.800 --> 00:09:05.760
+to avoid these restrictions or to be tied to a single platform, since we will
+
+00:09:05.760 --> 00:09:10.240
+not be using Clot or Olama.  However, we
+
+00:09:10.240 --> 00:09:15.120
+still have several options, both in the cloud and some local options, which we will discuss
+
+00:09:15.120 --> 00:09:19.080
+later.  From here, after selecting the templates
+
+00:09:19.080 --> 00:09:24.840
+we wish to use directly in Cloud Desktop, we must click on "Restart" to apply
+
+00:09:24.840 --> 00:09:29.240
+these changes.  I will click on it now, and then OAM will ask
+
+00:09:29.240 --> 00:09:34.120
+us to restart it again.  I will confirm that, and in a little while, look what we have here.
+
+00:09:34.120 --> 00:09:38.800
+We will find this selector that contains all the models we have configured,
+
+00:09:38.800 --> 00:09:44.080
+including the Minx M3, for which we can also change the required voltage from minimum
+
+00:09:44.080 --> 00:09:49.960
+to maximum.  We will have the Deepsic V4 model, the Yma 4 model which contains 31 billion parameters,
+
+00:09:49.960 --> 00:09:55.000
+Deepsic Flash, and Nvidia's Nemotron.  Thus, we are no longer just talking about opening up the
+
+00:09:55.000 --> 00:09:59.040
+horizons of cloud computing using small, locally installed, open-source models;  We
+
+00:09:59.040 --> 00:10:03.680
+will be able to connect very powerful models, but with the complete ecosystem and
+
+00:10:03.680 --> 00:10:07.680
+advanced features that Tropy provides.  In fact, if I click on any other model now,
+
+00:10:07.680 --> 00:10:12.160
+such as Deepsic V4, I will be able to use it for features
+
+00:10:12.160 --> 00:10:16.880
+such as co-working.  From here, I will also have options such as how
+
+00:10:16.880 --> 00:10:20.360
+approvals work.  In this case, I will set it to automatic mode.  I can also specify a
+
+00:10:20.360 --> 00:10:25.640
+folder.  In this case, I will select the downloads folder and click "Open",
+
+00:10:25.640 --> 00:10:30.080
+and now I will be able to access it.  Now I can ask it anything, like "
+
+00:10:30.080 --> 00:10:35.000
+Show all the items in my folder".  When I click on "Submit",
+
+00:10:35.000 --> 00:10:39.680
+the processing begins, and as we can see, it tells us that it will display everything in the Downloads folder.
+
+00:10:39.680 --> 00:10:44.320
+Notice that within a few seconds, everything we have is displayed,
+
+00:10:44.320 --> 00:10:49.600
+both individual files and the folders you created.  Indeed, that is exactly what I
+
+00:10:49.600 --> 00:10:54.520
+have in this volume.  I would like to share an important point with you, which is that I encountered an
+
+00:10:54.520 --> 00:10:59.480
+error when using the Deepsek model, as it stated that it requires a paid license from
+
+00:10:59.480 --> 00:11:03.040
+Lama.  Therefore, please bear in mind that they are currently going through a transition period with this new update, and you may
+
+00:11:03.040 --> 00:11:06.560
+encounter this problem.  However, you will be able to change the model to
+
+00:11:06.560 --> 00:11:10.840
+another model.  For example, I will remove Deepsek Pro from here, and then I will be able to continue
+
+00:11:10.840 --> 00:11:15.120
+using it.  Another section I would like to clarify is that when expanding
+
+00:11:15.120 --> 00:11:19.560
+these options, you will notice that we will retain all the options, such as cloud projects
+
+00:11:19.560 --> 00:11:23.800
+, the entire items section, the entire scheduled tasks section, and the entire customization section,
+
+00:11:23.800 --> 00:11:29.040
+which we can activate from here by creating skills and connectors, but without being
+
+00:11:29.040 --> 00:11:33.320
+restricted by the simple limitations available to us in the cloud.  To conclude this section, note that by
+
+00:11:33.320 --> 00:11:38.240
+returning to the code section, we can use it from here as well, and it will show
+
+00:11:38.240 --> 00:11:42.920
+us a record of the work we have done with the official templates.
+
+00:11:42.920 --> 00:11:46.520
+For example, this small dot you see here is a result of its use with Opus templates,
+
+00:11:46.520 --> 00:11:50.520
+but we can modify it here using any other template that appears
+
+00:11:50.520 --> 00:11:54.080
+, and we can ask it to do anything we want.  For example, if I write
+
+00:11:54.080 --> 00:11:58.440
+here: "Create a simple Notion-style task management application where I can
+
+00:11:58.440 --> 00:12:03.120
+see the status of tasks using Canban," then when I click "Submit," it will request access to a
+
+00:12:03.120 --> 00:12:08.200
+folder, so I will create and open it, and when I click "Submit,"
+
+00:12:08.200 --> 00:12:13.400
+this template will start processing using Cloud Code.  Furthermore, note that we will have all
+
+00:12:13.400 --> 00:12:18.760
+the options available in Cloud Code, including manual mode, accepting modifications, layout mode, and
+
+00:12:18.760 --> 00:12:24.080
+even automatic mode to manage permissions on our behalf.  This is a feature that was
+
+00:12:24.080 --> 00:12:27.720
+recently enabled in Cloud Code, and we will be able to use it here from our models.
+
+00:12:27.720 --> 00:12:32.440
+As you can see, we will also have all of
+
+00:12:32.440 --> 00:12:35.840
+Clot's signature pop-ups.  Here, for example, I am asked three questions about the application that I am going to create.  So I'm
+
+00:12:35.840 --> 00:12:39.880
+going to ask him here to do that using HTML.  I would also choose the
+
+00:12:39.880 --> 00:12:44.480
+Canban option with tags to simplify things.  And I will ask him here
+
+00:12:44.480 --> 00:12:49.960
+to start with local storage.  The application will continue to function, just as
+
+00:12:49.960 --> 00:12:53.760
+Cloud Code did, by asking us these intermediate questions to give us the result we are looking
+
+00:12:53.760 --> 00:12:58.040
+for.  After a while, on the first try, it will tell me that I have
+
+00:12:58.040 --> 00:13:02.720
+already created this mini-app with Cam style and some options.  It is worth noting that in addition to this
+
+00:13:02.720 --> 00:13:06.800
+visibility that we can achieve directly in the cloud, we will have all the
+
+00:13:06.800 --> 00:13:10.520
+same functions, such as the ability to annotate changes
+
+00:13:10.520 --> 00:13:15.560
+simply by enclosing them, or even the ability to export everything.  Here,
+
+00:13:15.560 --> 00:13:19.200
+for example, we can even open the file and find
+
+00:13:19.200 --> 00:13:28.760
+all the code and programming that I have done in this application.
+
+00:13:28.760 --> 00:13:34.400
+In this third section, we will talk about how to use all
+
+00:13:34.400 --> 00:13:38.960
+unrestricted and private cloud computing technologies.  Therefore, we will need to use local models, and here is
+
+00:13:38.960 --> 00:13:44.200
+good news: we can now get rid of downloading and installing a model that slows down
+
+00:13:44.200 --> 00:13:48.720
+our devices and makes us unsure of its functionality before
+
+00:13:48.720 --> 00:13:53.200
+downloading it.  The recently launched Can Run AI platform simplifies all of this
+
+00:13:53.200 --> 00:13:57.840
+.  This platform is completely free, and you won't
+
+00:13:57.840 --> 00:14:02.120
+even need to register.  I will also include the description below, and once you
+
+00:14:02.120 --> 00:14:07.080
+log in, the platform will scan your device.  In my case,
+
+00:14:07.080 --> 00:14:12.680
+I have an Apple M3 Pro processor, and that's why it was chosen this way.  The
+
+00:14:12.680 --> 00:14:17.640
+platform also showed me my V rank, which is 18 in this case, and some
+
+00:14:17.640 --> 00:14:23.720
+other aspects such as speeds, number of cores, etc.  With all this information, it can tell us which
+
+00:14:23.720 --> 00:14:28.480
+local models will work perfectly on our computer before we download them.
+
+00:14:28.480 --> 00:14:33.440
+From here, I can see some distinctive options, such as the GPT operating system with 20 billion operators, which will work very efficiently,
+
+00:14:33.440 --> 00:14:39.520
+as well as other models, including image models
+
+00:14:39.520 --> 00:14:44.640
+and other formats.  Here, for example, we find models such as Yema and Mistral
+
+00:14:44.640 --> 00:14:49.040
+.  But if you want to see all of this in more detail, I recommend clicking on the
+
+00:14:49.040 --> 00:14:54.360
+Templates section, where you can see all the templates that will work
+
+00:14:54.360 --> 00:15:01.320
+smoothly on your device.  In this case, out of approximately 104 models, about 41 models fit
+
+00:15:01.320 --> 00:15:05.880
+my device.  From here, we will also be able to see the evaluation of all these models.
+
+00:15:05.880 --> 00:15:10.600
+Various models are available, such as Junyuan video cards, Quen models,
+
+00:15:10.600 --> 00:15:15.520
+such as those with 9 billion parameters, as well as other models.  Note that some of them appear
+
+00:15:15.520 --> 00:15:19.960
+in red, which means they will not work efficiently on my device.  So,
+
+00:15:19.960 --> 00:15:24.800
+I can now do without downloading the forms and waiting to see if
+
+00:15:24.800 --> 00:15:29.080
+they will work or slow down my device, since I can check here to see if
+
+00:15:29.080 --> 00:15:33.240
+they will work well with my device.  If it doesn't work, I
+
+00:15:33.240 --> 00:15:38.240
+won't need to download it at all.  Also note that if the program does not recognize your device correctly,
+
+00:15:38.240 --> 00:15:42.560
+you can go to the Devices section and select the graphics card from there
+
+00:15:42.560 --> 00:15:47.960
+.  If you have an Apple Mac, you will be able to see all
+
+00:15:47.960 --> 00:15:51.480
+Apple Silicon devices, as well as
+
+00:15:51.480 --> 00:15:57.080
+Nvidia graphics cards, and below you will find all the cards from
+
+00:15:57.080 --> 00:16:04.360
+AMD, Intel, ARM and other companies.  Now, let's see how we can
+
+00:16:04.360 --> 00:16:09.360
+easily upload the forms locally.  To do that, we will go back to Olama and
+
+00:16:09.360 --> 00:16:14.760
+look on its official website for the "Models" section.  Through this, we will be able to see
+
+00:16:14.760 --> 00:16:18.760
+all the popular modern models, including
+
+00:16:18.760 --> 00:16:22.720
+cloud-based models and those that can be installed locally.  If you want to find a
+
+00:16:22.720 --> 00:16:28.080
+specific model, such as the latest version of Quen 3.8, simply click
+
+00:16:28.080 --> 00:16:32.560
+here, and you will find all the available versions there.  Currently, we only have
+
+00:16:32.560 --> 00:16:37.760
+the version with 27 billion parameters, which is too large for my device,
+
+00:16:37.760 --> 00:16:42.000
+so I will not download it.  But remember that if you have a Mac, it is advisable
+
+00:16:42.000 --> 00:16:46.400
+to download the MLX version, as it is optimized for
+
+00:16:46.400 --> 00:16:52.680
+Apple Silicon processors.  Otherwise, download the regular (non-MLX) version.  To see a simple example of this,
+
+00:16:52.680 --> 00:16:58.880
+let's look at a model from Olama and prove, for example, the
+
+00:16:58.880 --> 00:17:03.280
+latest version containing 8 billion parameters.  To do this, I will click on "Copy
+
+00:17:03.280 --> 00:17:09.560
+this form ID", then I will open the command window, type "olama full"
+
+00:17:09.560 --> 00:17:14.920
+and paste the copied name here, then press the Enter button, and the
+
+00:17:14.920 --> 00:17:19.080
+download will start as you can see.  The download speed will depend
+
+00:17:19.080 --> 00:17:24.120
+greatly on your device, but in my case, this 5GB will download in about 3
+
+00:17:24.120 --> 00:17:28.760
+minutes.  After these three minutes have passed, the application will inform me here that the
+
+00:17:28.760 --> 00:17:33.360
+download was successful.  Now, if we go back to the Olama app that we installed, when we click, for
+
+00:17:33.360 --> 00:17:37.480
+example, on the chat section, we will be able to see the form that we installed.
+
+00:17:37.480 --> 00:17:42.280
+For example, in this case, I would find it here, the Llama 3.1 model.  If you click on it and then ask it for
+
+00:17:42.280 --> 00:17:46.680
+something, such as to tell me an interesting fact about artificial intelligence, then when you click on "Submit",
+
+00:17:46.680 --> 00:17:52.320
+this form will respond, as quickly as you can see right now.
+
+00:17:52.320 --> 00:17:56.320
+Here, in fact, this revealed an interesting piece of information: you can pause
+
+00:17:56.320 --> 00:18:00.080
+the video to watch it, but the most important thing is not only the possibility of using this
+
+00:18:00.080 --> 00:18:03.880
+model specifically and in a limited way within this application, but also the possibility of
+
+00:18:03.880 --> 00:18:08.240
+using it with any other application that is in the applications section.
+
+00:18:08.240 --> 00:18:11.760
+We are now talking about a cloud desktop application, but we can
+
+00:18:11.760 --> 00:18:17.640
+do this with all other applications, such as Codex, Hermes, and others.  Now, if I go back to the Forms settings section
+
+00:18:17.640 --> 00:18:22.160
+, I will be able to edit them all using the locally installed forms
+
+00:18:22.160 --> 00:18:26.880
+.  To do this, I simply have to click here, and any form that does not appear as "cloud-based"
+
+00:18:26.880 --> 00:18:31.000
+will be on my device.  For example, to get a more robust model, I could
+
+00:18:31.000 --> 00:18:35.120
+use the Yma model with 12 billion parameters, which I have already installed.
+
+00:18:35.120 --> 00:18:39.760
+By doing so, I will have replaced all locally installed models.
+
+00:18:39.760 --> 00:18:44.720
+Some models are from Google (Yemma), others from Lama (Lama), and others from Alibaba (Quen).
+
+00:18:44.720 --> 00:18:50.880
+Now, if I click on "Restart the cloud" and then confirm again, we will see the
+
+00:18:50.880 --> 00:18:56.880
+cloud interface again, including the APIs, co-working, and chat.
+
+00:18:56.880 --> 00:19:01.640
+In the Templates section, we will find all the templates that we have installed
+
+00:19:01.640 --> 00:19:05.400
+locally.  Now, with the form we just downloaded selected
+
+00:19:05.400 --> 00:19:09.400
+, if we ask it any question from here,
+
+00:19:09.400 --> 00:19:14.400
+such as "The easiest way to make money using artificial intelligence," clicking "Submit"
+
+00:19:14.400 --> 00:19:18.400
+will start processing it.  As you can see, it is
+
+00:19:18.400 --> 00:19:23.360
+now writing this entire response, at the speed you are seeing now.  In fact, it
+
+00:19:23.360 --> 00:19:26.920
+only takes a few seconds.  Ultimately, it shows
+
+00:19:26.920 --> 00:19:31.520
+us all these ways we can make money using artificial intelligence, right down
+
+00:19:31.520 --> 00:19:37.440
+to this response in a cloud desktop tool.  The reality is that
+
+00:19:37.440 --> 00:19:42.960
+many changes are emerging daily in the field of generative intelligence, and this can be
+
+00:19:42.960 --> 00:19:48.560
+confusing unless we have a solid and strategic foundation for its use.  So
+
+00:19:48.560 --> 00:19:53.000
+, keep in mind that I offer an intensive AI program,
+
+00:19:53.000 --> 00:19:58.480
+where you can learn with me for two months via video calls, not in person, to have a
+
+00:19:58.480 --> 00:20:02.640
+personal and direct interaction.  You will be
+
+00:20:02.640 --> 00:20:07.960
+in a class of no more than 25 people to ensure that your progress is monitored
+
+00:20:07.960 --> 00:20:12.000
+on this learning journey in the field of generative intelligence.  Take a look at the program, the link to which I will put
+
+00:20:12.000 --> 00:20:21.520
+in the description below, as we are about to start, and I hope to see you in class.
+
+00:20:21.520 --> 00:20:26.200
+In this fourth unit, we will discuss an interesting thing that I discovered myself after seeing
+
+00:20:26.200 --> 00:20:30.960
+Lama's ability to activate the Clop Testo tool.
+
+00:20:30.960 --> 00:20:34.840
+As you can see, if we want to use cloud-based models, Lama offers
+
+00:20:34.840 --> 00:20:39.920
+paid plans, which are very good, but we may want to take better advantage of the free version.
+
+00:20:39.920 --> 00:20:44.200
+So, remember that we can connect it to any service provider, and to achieve
+
+00:20:44.200 --> 00:20:47.680
+this, I found the following trick: If we go back to the
+
+00:20:47.680 --> 00:20:53.520
+cloud desktop application that we just opened with Olama, and keep it open, then go
+
+00:20:53.520 --> 00:20:59.080
+to the Developers section (which will be here at the top on a Mac, and
+
+00:20:59.080 --> 00:21:03.440
+you can also access it on a Windows system), and click
+
+00:21:03.440 --> 00:21:09.360
+on the Configure Third-Party Inference option, we will find
+
+00:21:09.360 --> 00:21:15.120
+these settings that allow us to connect to any
+
+00:21:15.120 --> 00:21:19.840
+other service provider.  Note that what Olama is doing here is simply
+
+00:21:19.840 --> 00:21:25.280
+using its static API key with a primary URL for its gateway, which in this case is
+
+00:21:25.280 --> 00:21:30.160
+this address, and the API key is nothing more than the Olama name.  But remember that if we modify
+
+00:21:30.160 --> 00:21:33.960
+these two variables using an API key from any other service provider,
+
+00:21:33.960 --> 00:21:38.520
+we will also be able to link their models here.  To see that, first welcome to Open Router, the
+
+00:21:38.520 --> 00:21:42.360
+AI ​​modeling provider we've talked about a lot on this channel, because it
+
+00:21:42.360 --> 00:21:46.520
+unifies all AI models.  Not only that, but if we search
+
+00:21:46.520 --> 00:21:51.000
+for the word "free" here, we will find a range of free templates
+
+00:21:51.000 --> 00:21:54.960
+that we can use through their applications.  So, the first thing we will do is create a
+
+00:21:54.960 --> 00:21:58.920
+free account.  Once the account is created, we need to click
+
+00:21:58.920 --> 00:22:04.200
+on "Get App Key".  Next, we need to click on "New API Key" and name it whatever you like.  In
+
+00:22:04.200 --> 00:22:10.200
+this case, I would call it "Tutorial".  We click on "Create", copy this API key, and paste it into the
+
+00:22:10.200 --> 00:22:16.240
+"API Gateway Key" field.  Now we simply need to change the URL of the Open Router gateway
+
+00:22:16.240 --> 00:22:21.720
+, which will be this address here.  Keep in mind that this provider, like some other providers, will have
+
+00:22:21.720 --> 00:22:24.680
+some other options covered during this video, and I will also leave an
+
+00:22:24.680 --> 00:22:30.760
+ebook in the description below that contains all the details of the portal URLs and a
+
+00:22:30.760 --> 00:22:35.280
+detailed step-by-step guide to linking them, with more detailed explanations.  But in fact,
+
+00:22:35.280 --> 00:22:39.360
+using this information, if we now click on "Test Connection," you will see a
+
+00:22:39.360 --> 00:22:44.000
+green dot and a message below it indicating that we have
+
+00:22:44.000 --> 00:22:50.840
+connected with approximately 82 available models.  Now, if we click on "Apply Changes" and
+
+00:22:50.840 --> 00:22:56.240
+restart, you will see that after the countdown,
+
+00:22:56.240 --> 00:23:00.440
+the app will reopen with all the models from this provider.  Note
+
+00:23:00.440 --> 00:23:05.200
+that if you click on the "Templates" section now, you will find countless other templates,
+
+00:23:05.200 --> 00:23:09.320
+including some free ones.  For example,
+
+00:23:09.320 --> 00:23:13.520
+I found a template that said "free" in parentheses, but I also wanted to show you
+
+00:23:13.520 --> 00:23:17.880
+how we can even choose cloud templates to use through
+
+00:23:17.880 --> 00:23:22.680
+APIs.  This is something that deserves some credit, because these models are expensive,
+
+00:23:22.680 --> 00:23:26.720
+but the advantage is that we will have the flexibility to choose any model we want.  In this case,
+
+00:23:26.720 --> 00:23:30.920
+I would choose this model which I was not familiar with.  And again, if you ask it any question,
+
+00:23:30.920 --> 00:23:35.440
+such as the importance of open source, when you click "Submit", it
+
+00:23:35.440 --> 00:23:40.320
+will begin processing the answer.  He will write the answer,
+
+00:23:40.320 --> 00:23:45.040
+but unlike what we saw in the previous section, he will work here directly
+
+00:23:45.040 --> 00:23:49.840
+on the cloud with a service provider other than Lama.  In fact, here we will be able to see all the answers he
+
+00:23:49.840 --> 00:23:54.640
+gave us, and if you are interested, you can pause the video to watch them in
+
+00:23:54.640 --> 00:23:58.760
+detail.  What is most interesting is the emergence of new service providers with
+
+00:23:58.760 --> 00:24:02.960
+highly competitive offerings thanks to the availability of new open-source AI models at
+
+00:24:02.960 --> 00:24:07.880
+very low costs or even running on their own servers.  Therefore,
+
+00:24:07.880 --> 00:24:12.960
+we can find tools like Orca Router, where if we click on “Models”
+
+00:24:12.960 --> 00:24:17.080
+and filter the results by lowest price, we will find that they
+
+00:24:17.080 --> 00:24:21.240
+include free models, such as these two, but we can also
+
+00:24:21.240 --> 00:24:27.360
+find more popular models such as Tensen Hunjuan and Queen 3.8, or even
+
+00:24:27.360 --> 00:24:31.560
+Deepsic’s own models.  Therefore, we can also link it to any other provider,
+
+00:24:31.560 --> 00:24:36.360
+such as this provider for example.  To see that, I clicked on my account to create an
+
+00:24:36.360 --> 00:24:41.800
+API key.  Note that I will again call it here, in this case, "tutorial".  Click
+
+00:24:41.800 --> 00:24:47.560
+on "Create" and copy this API key, then paste it into the "API" field in developer mode
+
+00:24:47.560 --> 00:24:53.440
+, and change the URL to the correct address.  In this way, we can repeat the
+
+00:24:53.440 --> 00:24:57.920
+process to switch between providers.  Keep in mind that it is best to have a
+
+00:24:57.920 --> 00:25:01.960
+unified platform for all providers and free templates so that you switch between them
+
+00:25:01.960 --> 00:25:06.160
+automatically when you reach the limit.  But to see all of this, remember that I
+
+00:25:06.160 --> 00:25:14.280
+previously mentioned a tool called OVN route that enables this.  [Music]
+
+00:25:15.800 --> 00:25:20.240
+In the fifth and final usage scenario, we will quickly see how we can also
+
+00:25:20.240 --> 00:25:24.480
+link with any official model.  It is no longer just a matter of
+
+00:25:24.480 --> 00:25:29.520
+connecting to service providers such as Open Router, Orc Router, or others. We can now access the
+
+00:25:29.520 --> 00:25:34.600
+application programming interface (API) of a model we prefer to use, such as Deeps Seek, Kimik models, or
+
+00:25:34.600 --> 00:25:39.920
+even Zai’s GLM models, and connect it directly to the cloud desktop version, which has
+
+00:25:39.920 --> 00:25:44.360
+excellent capabilities at a much lower cost.  To do
+
+00:25:44.360 --> 00:25:48.360
+this, simply visit the official Deeps platform, the link to which I will put
+
+00:25:48.360 --> 00:25:53.160
+in the description below.  By clicking on "Premium Access", you can add credit
+
+00:25:53.160 --> 00:25:57.560
+.  For example, here I see that I added two dollars,
+
+00:25:57.560 --> 00:26:02.320
+of which I spent only $0.40 on various applications I work on.
+
+00:26:02.320 --> 00:26:06.440
+This video is here.  I have previously mentioned a type of cloud computing code,
+
+00:26:06.440 --> 00:26:11.520
+but Depsc has recently launched it, and I admit that I prefer it because it is more
+
+00:26:11.520 --> 00:26:16.600
+flexible.  To continue from where we left off, if I go to the
+
+00:26:16.600 --> 00:26:22.680
+API Key section and create a secret key and copy it from here, we can go back
+
+00:26:22.680 --> 00:26:29.480
+to the API Key section, replace it in the primary URL, and change it to the correct address.
+
+00:26:29.480 --> 00:26:34.560
+In this way, we can test the connection, but it is very important that we have the
+
+00:26:34.560 --> 00:26:40.080
+correct base URL for the gateway and that it is compatible with this method.
+
+00:26:40.080 --> 00:26:44.200
+I will explain all of this in detail in the PDF file that I will share with you, because
+
+00:26:44.200 --> 00:26:49.240
+as you can see, this particular case shows me this error.  If you wish to
+
+00:26:49.240 --> 00:26:52.840
+avoid it, the document I will link to in the description will show you which
+
+00:26:52.840 --> 00:26:57.960
+URLs should be used and which can be used in this way to prevent
+
+00:26:57.960 --> 00:27:02.800
+these types of errors.  Now you can take advantage of the most powerful tools available without
+
+00:27:02.800 --> 00:27:06.880
+being restricted by a license that dictates how far you should go, because
+
+00:27:06.880 --> 00:27:17.920
+barriers sometimes don't disappear until you find a different way that allows you to move forward.
+

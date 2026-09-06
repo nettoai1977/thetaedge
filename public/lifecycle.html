@@ -1,0 +1,731 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>Strategy Lifecycle — ThetaEdge</title>
+<style>
+  body { background:#0b0e14; color:#d1d4dc; font-family:-apple-system,sans-serif; margin:0; padding:16px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .sub { color:#787b86; font-size:12px; margin-bottom:12px; }
+  .stats { display:flex; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .stat { background:#131722; border:1px solid #2a2e39; border-radius:4px; padding:10px 14px; font-size:12px; }
+  .board { display:flex; gap:10px; align-items:flex-start; overflow-x:auto; }
+  .column { min-width:230px; width:230px; background:#131722; border-radius:4px; padding:8px; }
+  .col-header { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.4px;
+                 border-top:3px solid #2a2e39; padding:4px 0 8px; }
+  .count { background:#2a2e39; border-radius:8px; padding:1px 7px; font-size:11px; }
+  .card { background:#1e222d; border:1px solid #2a2e39; border-radius:4px; padding:8px; margin-bottom:8px; font-size:11px; }
+  .card-title { font-weight:700; color:#fff; font-size:12px; margin-bottom:3px; }
+  .card-desc { color:#787b86; margin-bottom:5px; }
+  .chip { display:inline-block; background:#2a2e39; border-radius:3px; padding:1px 5px; margin:1px 2px 1px 0; font-size:10px; }
+  .fail { color:#f23645; margin-top:4px; }
+  .regime { color:#f5b942; margin-top:3px; }
+  .date { color:#4a4e59; margin-top:4px; font-size:10px; }
+  .empty { color:#4a4e59; font-size:11px; padding:6px; }
+</style></head><body>
+<h1>🐋 Strategy Lifecycle — Kanban</h1>
+<div class="sub">generated 2026-09-06 11:09 UTC · dual-engine validation (NautilusTrader + Vibe-Trading) · black-swan battery (9 windows) · costs: taker fees + funding + margin</div>
+<div class="stats">
+  <div class="stat"><b>Funnel</b><br>generated 1 → gated 2 → incubating 4 → ready 0<br>
+    survival: 200.0% → 400.0%</div>
+  
+    <div class="stat"><b>RSI(14) BTC paper</b><br>
+      last computed: 2026-09-04 | RSI: 54.04<br>
+      position: FLAT<br>
+      closed trades: 0 | cum PnL: $0.00
+    </div>
+  <div class="stat"><b>Black-swan battery</b><br>9 windows: COVID, LUNA, FTX, Celsius,<br>Bybit hack, Iran strike, carry unwind,<br>Binance FUD, tariff shock</div>
+  <div class="stat"><b>Cost model</b><br>futures taker 0.05%/side<br>spot 0.1%/side · funding 0.01%/8h<br>(0.05%/8h crash premium)</div>
+</div>
+<div class="board">
+        <div class="column">
+          <div class="col-header" style="border-top-color:#7f1d1d">🗄️ ARCHIVE (dead) <span class="count">78</span></div>
+          
+    <div class="card" data-stage="archived">
+      <div class="card-title">bitcartel_dca_btc_long</div>
+      <div class="card-desc">BitCartel 3Commas DCA grid: long BTC, base $217 + 7 safety orders (0.21% dev step x1.78, vol x1.8), TP 0.4%/0.22% trailing, SL off, x125 leverage</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ structural: x125 leverage + daily-bar unmodelable intrabar path; every variant pool-exhausted or liquidated within days (v3 sim); doc itself requires continuous capital additions; funnel math of doc inconsistent with its own capital table</div><div class='regime'>regime: any</div>
+      <div class="date">updated 2026-09-04</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bitcartel_original_x125</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ structural: 9/9 black-swan windows liquidated</div><div class='regime'>regime: crash</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bitcartel_x20</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ structural: 8/9 liquidated, funding 45% of pool</div><div class='regime'>regime: crash</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bitcartel_x5</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ structural: 5/9 liquidated</div><div class='regime'>regime: crash</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bitcartel_spot</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ no-edge: fees exceed TP after costs</div><div class='regime'>regime: crash</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">timesfm_volgate_btc</div>
+      <div class="card-desc">TimesFM-3 zero-shot 24h vol forecast as regime gate for incubating strategies (blocking new entries when forecast vol &gt;1.5% or band &gt;0.6)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ Zero-shot vol forecast = persistence model; black swans are jumps invisible in prior 1000h. Realized-vol baseline failed identically -&gt; property of the problem, not the model.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_1.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.33, OOS -44.3%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_1.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.33, OOS -44.3%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_1.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.33, OOS -44.3%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.0_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -42.5%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.0_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -42.5%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.0_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -42.5%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.04, OOS -34.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.04, OOS -34.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_20_2.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.04, OOS -34.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_1.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.295, OOS -47.4%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_1.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.32, OOS -47.4%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_1.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.32, OOS -47.4%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.0_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -42.5%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.0_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -41.8%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.0_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -41.8%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.115, OOS -20.6%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.115, OOS -20.6%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_30_2.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.115, OOS -20.6%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_1.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -37.9%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_1.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -37.9%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_1.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.235, OOS -37.9%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.0_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.4, OOS -33.9%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.0_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.4, OOS -33.7%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.0_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.4, OOS -33.7%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.5_0.05</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.19, OOS -29.0%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.5_0.08</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.19, OOS -29.0%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">bb_40_2.5_0.12</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.19, OOS -29.0%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_240_120</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.335, OOS +2.0%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_480_120</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.315, OOS +15.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_480_240</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.270, OOS +0.9%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_480_360</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.465, OOS -8.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_720_120</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.310, OOS +15.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_720_240</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.170, OOS +4.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_720_360</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.300, OOS -3.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_1200_120</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.225, OOS +6.8%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_1200_240</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.185, OOS -2.8%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">dc_1200_360</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC_KILLED: p=0.305, OOS -7.1%</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">sma_2050</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">weekly_momentum</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">supertrend_10_3_classic</div>
+      <div class="card-desc">Supertrend(10,3) classic — OOS negative, daily bars</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ OOS return &lt; 0 on 2025 daily bars (consistent underfitting of wider params or overfitting of tighter params)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">supertrend_10_2_tight</div>
+      <div class="card-desc">Supertrend(10,2) tight — OOS negative, daily bars</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ OOS return &lt; 0 on 2025 daily bars (consistent underfitting of wider params or overfitting of tighter params)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">supertrend_14_3_slow</div>
+      <div class="card-desc">Supertrend(14,3) slow — OOS negative, daily bars</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ OOS return &lt; 0 on 2025 daily bars (consistent underfitting of wider params or overfitting of tighter params)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">supertrend_7_3_fast</div>
+      <div class="card-desc">Supertrend(7,3) fast — OOS negative, daily bars</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ OOS return &lt; 0 on 2025 daily bars (consistent underfitting of wider params or overfitting of tighter params)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">supertrend_10_3_macd</div>
+      <div class="card-desc">Supertrend(10,3)+MACD — OOS negative, daily bars</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ OOS return &lt; 0 on 2025 daily bars (consistent underfitting of wider params or overfitting of tighter params)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_10_1.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_10_1.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_10_2.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_10_2.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_10_2.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_10_2.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_10_3.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_10_3.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_1.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_20_1.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_2.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_20_2.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_2.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_20_2.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_3.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_20_3.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_30_1.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_30_1.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_30_2.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_30_2.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_30_2.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_30_2.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_30_3.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_30_3.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_45_1.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_45_1.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_45_2.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_45_2.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_45_2.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_45_2.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_45_3.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_45_3.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_60_1.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_60_1.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_60_2.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_60_2.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_60_2.5_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_60_2.5_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_60_3.0_vwap</div>
+      <div class="card-desc">VWAP band variant vwap_60_3.0_vwap (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_2.0_band</div>
+      <div class="card-desc">VWAP band variant vwap_20_2.0_band (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_20_3.0_band</div>
+      <div class="card-desc">VWAP band variant vwap_20_3.0_band (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">vwap_vwap_45_3.0_band</div>
+      <div class="card-desc">VWAP band variant vwap_45_3.0_band (hourly bars)</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ MC kill: timing alignment not better than block-shifted luck vs buy&amp;hold</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">mallik_mallik_1200_6000_v2_nodelay</div>
+      <div class="card-desc">Mallik MA-structure (close &gt; MA_fast &amp; MA_slow), BTC hourly, roc_trim variants</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ v1 (+309% IS) was lookahead artifact: same-bar close decision credited same-bar return; with next-bar fill the family collapses (best: IS +30.9%/OOS +1.7%, MCp 0.29). Mallik's edge claim does not transfer to BTC hourly as simple MA structure.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">mallik_mallik_1200_3000_v2_nodelay</div>
+      <div class="card-desc">Mallik MA-structure (close &gt; MA_fast &amp; MA_slow), BTC hourly, roc_trim variants</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ v1 (+309% IS) was lookahead artifact: same-bar close decision credited same-bar return; with next-bar fill the family collapses (best: IS +30.9%/OOS +1.7%, MCp 0.29). Mallik's edge claim does not transfer to BTC hourly as simple MA structure.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">mallik_mallik_600_3000_v2_nodelay</div>
+      <div class="card-desc">Mallik MA-structure (close &gt; MA_fast &amp; MA_slow), BTC hourly, roc_trim variants</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ v1 (+309% IS) was lookahead artifact: same-bar close decision credited same-bar return; with next-bar fill the family collapses (best: IS +30.9%/OOS +1.7%, MCp 0.29). Mallik's edge claim does not transfer to BTC hourly as simple MA structure.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">mallik_mallik_720_4320_v2_nodelay</div>
+      <div class="card-desc">Mallik MA-structure (close &gt; MA_fast &amp; MA_slow), BTC hourly, roc_trim variants</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ v1 (+309% IS) was lookahead artifact: same-bar close decision credited same-bar return; with next-bar fill the family collapses (best: IS +30.9%/OOS +1.7%, MCp 0.29). Mallik's edge claim does not transfer to BTC hourly as simple MA structure.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="archived">
+      <div class="card-title">mallik_mallik_240_1200_v2_nodelay</div>
+      <div class="card-desc">Mallik MA-structure (close &gt; MA_fast &amp; MA_slow), BTC hourly, roc_trim variants</div>
+      <div class="chips"></div>
+      <div class='fail'>❌ v1 (+309% IS) was lookahead artifact: same-bar close decision credited same-bar return; with next-bar fill the family collapses (best: IS +30.9%/OOS +1.7%, MCp 0.29). Mallik's edge claim does not transfer to BTC hourly as simple MA structure.</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+        </div>
+        <div class="column">
+          <div class="col-header" style="border-top-color:#1e3a8a">💡 GENERATED <span class="count">0</span></div>
+          <div class='empty'>—</div>
+        </div>
+        <div class="column">
+          <div class="col-header" style="border-top-color:#1e40af">🔬 BACKTESTED <span class="count">0</span></div>
+          <div class='empty'>—</div>
+        </div>
+        <div class="column">
+          <div class="col-header" style="border-top-color:#065f46">✅ GATED <span class="count">2</span></div>
+          
+    <div class="card" data-stage="gated_pass">
+      <div class="card-title">supertrend_10_4_wide_btc_long</div>
+      <div class="card-desc">Supertrend(10,4) BTC daily close, long-only, spot. ATR-based trend-following: enter when price crosses above lower band, exit on upper band cross. Fixed fractional 5% risk per trade.</div>
+      <div class="chips"><span class='chip'>return pct: +34.98</span></div>
+      <div class='regime'>regime: trend-following (complementary to RSI mean-reversion)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="gated_pass">
+      <div class="card-title">vwap_45_2.0_band</div>
+      <div class="card-desc">VWAP band reversion (rolling 45-bar volume-weighted, 2.0σ): enter on close re-entry from above upper band, exit on lower-band touch. Long-only.</div>
+      <div class="chips"></div>
+      <div class='regime'>regime: mean-reversion (VWAP band snap)</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+        </div>
+        <div class="column">
+          <div class="col-header" style="border-top-color:#92400e">🧪 INCUBATION <span class="count">4</span></div>
+          
+    <div class="card" data-stage="incubating">
+      <div class="card-title">test_rsi_3070</div>
+      <div class="card-desc"></div>
+      <div class="chips"><span class='chip'>return pct: +42.20</span><span class='chip'>profit factor: 7.89</span></div>
+      <div class='regime'>regime: mixed</div>
+      <div class="date">updated </div>
+    </div>
+
+    <div class="card" data-stage="incubating">
+      <div class="card-title">bitcartel_mod_sl5_x5</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      <div class='regime'>regime: crash-tested</div>
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="incubating">
+      <div class="card-title">supertrend_10_4_wide_btc</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      
+      <div class="date">updated 2026-09-05</div>
+    </div>
+
+    <div class="card" data-stage="incubating">
+      <div class="card-title">vwap_dualfilter_defensive</div>
+      <div class="card-desc"></div>
+      <div class="chips"></div>
+      
+      <div class="date">updated 2026-09-05</div>
+    </div>
+        </div>
+        <div class="column">
+          <div class="col-header" style="border-top-color:#064e3b">🚀 DEPLOYMENT-READY <span class="count">0</span></div>
+          <div class='empty'>—</div>
+        </div></div>
+</body></html>
