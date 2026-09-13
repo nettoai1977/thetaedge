@@ -1,5 +1,19 @@
 [
  {
+  "date": "2026-09-14",
+  "signal": "avoid",
+  "strategy": null,
+  "put_strike": null,
+  "call_strike": null,
+  "contracts": 0,
+  "spot": 714.88,
+  "vix": 15.84,
+  "iv_rank": 22.1,
+  "reasoning": [
+   "FOMC in 2 days"
+  ]
+ },
+ {
   "date": "2026-09-13",
   "signal": "buy",
   "strategy": "calendar_call",
