@@ -1,5 +1,21 @@
 [
  {
+  "date": "2026-09-28",
+  "signal": "buy",
+  "strategy": "double_calendar",
+  "put_strike": 735,
+  "call_strike": 755,
+  "contracts": 0,
+  "spot": 744.5,
+  "vix": 14.87,
+  "iv_rank": 32.9,
+  "reasoning": [
+   "VIX LOW - Double Calendar",
+   "Strikes: Put 735 / Call 755 (\u00b1$10 validated width)",
+   "Est. debit $173/contract; 0 contracts fits $20 risk budget"
+  ]
+ },
+ {
   "date": "2026-09-16",
   "signal": "avoid",
   "strategy": null,
